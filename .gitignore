@@ -7,6 +7,10 @@
 .atom/
 .buildlog/
 .history
+./android
+./ios
+./web
+./windows
 .svn/
 migrate_working_dir/
 
