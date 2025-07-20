@@ -26,7 +26,7 @@ void main() async {
   final isBack4AppInitialized = await Back4AppConfig.initialize();
 
   if (!isBack4AppInitialized) {
-    print('❌ فشل في تهيئة Back4App');
+    print('❌ فشل في تهيئة Bacsk4App');
     // يمكن هنا إظهار شاشة خطأ أو المحاولة مرة أخرى
   }
 
