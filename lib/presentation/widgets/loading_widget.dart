@@ -1,6 +1,5 @@
 // lib/presentation/widgets/loading_widget.dart
 import 'package:flutter/material.dart';
-import 'package:shimmer/shimmer.dart';
 
 import '../../core/constants/app_colors.dart';
 
@@ -11,12 +10,12 @@ class LoadingWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _buildShimmerGrid(),
+        _buildSimpleGrid(),
       ],
     );
   }
 
-  Widget _buildShimmerGrid() {
+  Widget _buildSimpleGrid() {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -29,74 +28,88 @@ class LoadingWidget extends StatelessWidget {
       ),
       itemCount: 6,
       itemBuilder: (context, index) {
-        return _buildShimmerCard();
+        return _buildLoadingCard();
       },
     );
   }
 
-  Widget _buildShimmerCard() {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image placeholder
-            Container(
-              height: 120,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+  Widget _buildLoadingCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceVariant,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Image placeholder
+          Container(
+            height: 120,
+            decoration: BoxDecoration(
+              color: AppColors.surfaceVariant.withOpacity(0.7),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+            ),
+            child: Center(
+              child: CircularProgressIndicator(
+                color: AppColors.primary,
+                strokeWidth: 2,
               ),
             ),
+          ),
 
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Brand placeholder
-                  Container(
-                    width: 60,
-                    height: 12,
-                    color: Colors.white,
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Brand placeholder
+                Container(
+                  width: 60,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceVariant.withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(6),
                   ),
+                ),
 
-                  const SizedBox(height: 8),
+                const SizedBox(height: 8),
 
-                  // Title placeholder
-                  Container(
-                    width: double.infinity,
-                    height: 14,
-                    color: Colors.white,
+                // Title placeholder
+                Container(
+                  width: double.infinity,
+                  height: 14,
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceVariant.withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(7),
                   ),
+                ),
 
-                  const SizedBox(height: 4),
+                const SizedBox(height: 4),
 
-                  Container(
-                    width: 120,
-                    height: 14,
-                    color: Colors.white,
+                Container(
+                  width: 120,
+                  height: 14,
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceVariant.withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(7),
                   ),
+                ),
 
-                  const SizedBox(height: 12),
+                const SizedBox(height: 12),
 
-                  // Price placeholder
-                  Container(
-                    width: 80,
-                    height: 16,
-                    color: Colors.white,
+                // Price placeholder
+                Container(
+                  width: 80,
+                  height: 16,
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceVariant.withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

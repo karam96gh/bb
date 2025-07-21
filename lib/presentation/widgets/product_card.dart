@@ -1,4 +1,4 @@
-// lib/presentation/widgets/product_card.dart
+// lib/presentation/widgets/product_card.dart - إصلاح مشكلة الخطوط الصفراء
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:provider/provider.dart';
@@ -38,61 +38,67 @@ class ProductCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Product Image
+            // Product Image - إصلاح الارتفاع
             _buildProductImage(context),
 
-            // Product Info
+            // Product Info - إصلاح التخطيط
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(8), // تقليل padding
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min, // إضافة هذا
                   children: [
-                    // Brand
+                    // Brand - إصلاح النص
                     Text(
                       product.brand,
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         color: AppColors.primary,
                         fontWeight: FontWeight.w600,
+                        fontSize: 10, // تقليل الحجم
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+
+                    const SizedBox(height: 2),
+
+                    // Product Name - إصلاح النص الطويل
+                    Flexible(
+                      child: Text(
+                        product.arabicName,
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          color: AppColors.onSurface,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12, // تقليل الحجم
+                          height: 1.2, // تقليل ارتفاع السطر
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
 
                     const SizedBox(height: 4),
 
-                    // Product Name
-                    Text(
-                      product.arabicName,
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: AppColors.onSurface,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    // Rating and Reviews
+                    // Rating and Reviews - إصلاح التخطيط
                     if (product.rating > 0)
                       Row(
                         children: [
                           Icon(
                             Icons.star,
-                            size: 14,
+                            size: 12,
                             color: AppColors.warning,
                           ),
-                          const SizedBox(width: 4),
-                          Text(
-                            product.ratingText,
-                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: AppColors.onSurfaceVariant,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '(${product.reviewsCount})',
-                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: AppColors.onSurfaceVariant,
+                          const SizedBox(width: 2),
+                          Flexible(
+                            child: Text(
+                              '${product.ratingText} (${product.reviewsCount})',
+                              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                color: AppColors.onSurfaceVariant,
+                                fontSize: 9,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
@@ -100,24 +106,33 @@ class ProductCard extends StatelessWidget {
 
                     const Spacer(),
 
-                    // Price and Colors
+                    // Price and Colors - إصلاح التخطيط
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          product.displayPrice,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.bold,
+                        Flexible(
+                          flex: 2,
+                          child: Text(
+                            product.displayPrice,
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         if (product.colors.isNotEmpty)
-                          _buildColorIndicators(),
+                          Flexible(
+                            flex: 1,
+                            child: _buildColorIndicators(),
+                          ),
                       ],
                     ),
 
                     if (showAddToCart) ...[
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 6),
                       _buildAddToCartButton(context),
                     ],
                   ],
@@ -132,7 +147,7 @@ class ProductCard extends StatelessWidget {
 
   Widget _buildProductImage(BuildContext context) {
     return Container(
-      height: 120,
+      height: 100, // تحديد ارتفاع ثابت
       width: double.infinity,
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
@@ -154,7 +169,7 @@ class ProductCard extends StatelessWidget {
                   child: Icon(
                     Icons.image,
                     color: AppColors.onSurfaceVariant,
-                    size: 40,
+                    size: 30,
                   ),
                 ),
               ),
@@ -164,7 +179,7 @@ class ProductCard extends StatelessWidget {
                   child: Icon(
                     Icons.broken_image,
                     color: AppColors.onSurfaceVariant,
-                    size: 40,
+                    size: 30,
                   ),
                 ),
               ),
@@ -175,7 +190,7 @@ class ProductCard extends StatelessWidget {
                 child: Icon(
                   Icons.shopping_bag,
                   color: AppColors.onSurfaceVariant,
-                  size: 40,
+                  size: 30,
                 ),
               ),
             ),
@@ -186,25 +201,22 @@ class ProductCard extends StatelessWidget {
                 color: Colors.black.withOpacity(0.5),
                 child: Center(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: AppColors.error,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       'غير متوفر',
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
-                        fontSize: 12,
+                        fontSize: 10,
                       ),
                     ),
                   ),
                 ),
               ),
-
-            // Discount Badge (if applicable)
-            // You can add discount logic here
           ],
         ),
       ),
@@ -215,18 +227,19 @@ class ProductCard extends StatelessWidget {
     final displayColors = product.colors.take(3).toList();
 
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         ...displayColors.map((color) {
           return Container(
-            width: 12,
-            height: 12,
-            margin: const EdgeInsets.only(left: 2),
+            width: 10,
+            height: 10,
+            margin: const EdgeInsets.only(left: 1),
             decoration: BoxDecoration(
               color: color.color,
               shape: BoxShape.circle,
               border: Border.all(
                 color: Colors.grey.withOpacity(0.3),
-                width: 1,
+                width: 0.5,
               ),
             ),
           );
@@ -235,7 +248,7 @@ class ProductCard extends StatelessWidget {
           Text(
             '+${product.colors.length - 3}',
             style: const TextStyle(
-              fontSize: 10,
+              fontSize: 8,
               color: AppColors.onSurfaceVariant,
             ),
           ),
@@ -248,21 +261,21 @@ class ProductCard extends StatelessWidget {
       builder: (context, cartProvider, child) {
         return SizedBox(
           width: double.infinity,
-          height: 32,
+          height: 28, // تقليل الارتفاع
           child: ElevatedButton(
             onPressed: product.isOutOfStock ? null : () => _addToCart(context),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(6),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 4),
             ),
             child: const Text(
               'إضافة للسلة',
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 10,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -391,5 +404,3 @@ class ProductCard extends StatelessWidget {
     }
   }
 }
-
-
