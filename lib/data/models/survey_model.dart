@@ -1,3 +1,6 @@
+// lib/data/models/survey_model.dart (Fixed)
+import '../../../core/utils/calculation_utils.dart';
+
 class SurveyQuestion {
   final String objectId;
   final int questionNumber;
@@ -26,7 +29,7 @@ class SurveyQuestion {
   factory SurveyQuestion.fromJson(Map<String, dynamic> json) {
     return SurveyQuestion(
       objectId: json['objectId'] ?? '',
-      questionNumber: json['questionNumber'] ?? 0,
+      questionNumber: CalculationUtils.safeIntFromDynamic(json['questionNumber']),
       section: json['section'] ?? '',
       questionText: json['questionText'] ?? '',
       arabicQuestionText: json['arabicQuestionText'] ?? '',
@@ -36,7 +39,7 @@ class SurveyQuestion {
           .toList(),
       weights: Map<String, dynamic>.from(json['weights'] ?? {}),
       isActive: json['isActive'] ?? true,
-      displayOrder: json['displayOrder'] ?? 0,
+      displayOrder: CalculationUtils.safeIntFromDynamic(json['displayOrder']),
     );
   }
 
@@ -78,7 +81,8 @@ class QuestionOption {
       key: json['key'] ?? '',
       text: json['text'] ?? '',
       arabicText: json['arabicText'] ?? '',
-      weights: Map<String, int>.from(json['weights'] ?? {}),
+      // استخدام دالة آمنة لتحويل الأوزان
+      weights: CalculationUtils.safeIntMapFromDynamic(json['weights']),
     );
   }
 
@@ -92,7 +96,6 @@ class QuestionOption {
   }
 }
 
-// lib/data/models/survey_model.dart
 class Survey {
   final String objectId;
   final String userId;
@@ -158,13 +161,14 @@ class Survey {
       objectId: json['objectId'] ?? '',
       userId: json['user']?['objectId'] ?? '',
       answers: Map<String, String>.from(json['answers'] ?? {}),
-      skinAnalysis: Map<String, double>.from(json['skinAnalysis'] ?? {}),
+      // استخدام دالة آمنة لتحويل البيانات
+      skinAnalysis: CalculationUtils.safeDoubleMapFromDynamic(json['skinAnalysis']),
       problemsAnalysis: Map<String, dynamic>.from(json['problemsAnalysis'] ?? {}),
       preferencesAnalysis: Map<String, dynamic>.from(json['preferencesAnalysis'] ?? {}),
       finalSkinType: json['finalSkinType'] ?? '',
-      confidenceScore: (json['confidenceScore'] ?? 0).toDouble(),
+      confidenceScore: CalculationUtils.safeDoubleFromDynamic(json['confidenceScore']),
       recommendations: List<String>.from(json['recommendations'] ?? []),
-      recommendationScores: Map<String, double>.from(json['recommendationScores'] ?? {}),
+      recommendationScores: CalculationUtils.safeDoubleMapFromDynamic(json['recommendationScores']),
       completedAt: DateTime.tryParse(json['completedAt'] ?? '') ?? DateTime.now(),
       isActive: json['isActive'] ?? true,
     );

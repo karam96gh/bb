@@ -1,4 +1,4 @@
-// lib/data/services/survey_service.dart
+// lib/data/services/survey_service.dart (Fixed)
 import 'package:parse_server_sdk_flutter/parse_server_sdk_flutter.dart';
 
 import '../models/survey_model.dart';
@@ -14,7 +14,30 @@ class SurveyService {
       query.orderByAscending('displayOrder');
 
       final results = await Back4AppService.queryWithConditions(query);
-      return results.map((result) => SurveyQuestion.fromJson(result.toJson())).toList();
+
+      // Debug: Print the raw results to see the data structure
+      print('📋 Raw survey questions data:');
+      for (int i = 0; i < results.length && i < 2; i++) {
+        print('Question ${i + 1}: ${results[i].toJson()}');
+      }
+
+      final questions = <SurveyQuestion>[];
+
+      for (final result in results) {
+        try {
+          final question = SurveyQuestion.fromJson(result.toJson());
+          questions.add(question);
+        } catch (e) {
+          print('❌ Error parsing question: ${result.get('questionNumber')} - $e');
+          print('Raw data: ${result.toJson()}');
+          // Skip this question and continue with others
+          continue;
+        }
+      }
+
+      print('✅ Successfully parsed ${questions.length} questions out of ${results.length} total');
+      return questions;
+
     } catch (e) {
       print('❌ Error getting survey questions: $e');
       return [];
@@ -30,7 +53,19 @@ class SurveyService {
       query.orderByAscending('displayOrder');
 
       final results = await Back4AppService.queryWithConditions(query);
-      return results.map((result) => SurveyQuestion.fromJson(result.toJson())).toList();
+
+      final questions = <SurveyQuestion>[];
+      for (final result in results) {
+        try {
+          final question = SurveyQuestion.fromJson(result.toJson());
+          questions.add(question);
+        } catch (e) {
+          print('❌ Error parsing question in section $section: $e');
+          continue;
+        }
+      }
+
+      return questions;
     } catch (e) {
       print('❌ Error getting questions by section: $e');
       return [];
@@ -82,6 +117,41 @@ class SurveyService {
     } catch (e) {
       print('❌ Error updating survey: $e');
       return false;
+    }
+  }
+
+  // Test function to validate question structure
+  static Future<void> validateQuestionStructure() async {
+    try {
+      print('🔍 Validating question structure...');
+
+      final query = Back4AppService.buildQuery<ParseObject>(AppConstants.surveyQuestionsTable);
+      query.setLimit(1);
+
+      final results = await Back4AppService.queryWithConditions(query);
+
+      if (results.isNotEmpty) {
+        final rawData = results.first.toJson();
+        print('📋 Sample question structure:');
+        print('Keys: ${rawData.keys.toList()}');
+
+        if (rawData['options'] != null) {
+          final options = rawData['options'] as List;
+          if (options.isNotEmpty) {
+            print('📋 Sample option structure:');
+            print(options.first);
+
+            final sampleOption = options.first as Map<String, dynamic>;
+            if (sampleOption['weights'] != null) {
+              print('📋 Sample weights structure:');
+              print('Weights type: ${sampleOption['weights'].runtimeType}');
+              print('Weights content: ${sampleOption['weights']}');
+            }
+          }
+        }
+      }
+    } catch (e) {
+      print('❌ Error validating question structure: $e');
     }
   }
 }
