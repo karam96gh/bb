@@ -1,4 +1,4 @@
-// lib/main.dart
+// lib/main.dart (Updated with Auth)
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -15,9 +15,8 @@ import 'logic/providers/product_provider.dart';
 import 'logic/providers/cart_provider.dart';
 import 'logic/providers/order_provider.dart';
 import 'logic/providers/recommendation_provider.dart';
+import 'logic/providers/uth_provider.dart';
 import 'presentation/screens/splash/splash_screen.dart';
-import 'presentation/screens/welcome/welcome_screen.dart';
-import 'presentation/navigation/bottom_navigation.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +25,7 @@ void main() async {
   final isBack4AppInitialized = await Back4AppConfig.initialize();
 
   if (!isBack4AppInitialized) {
-    print('❌ فشل في تهيئة Bacsk4App');
+    print('❌ فشل في تهيئة Back4App');
     // يمكن هنا إظهار شاشة خطأ أو المحاولة مرة أخرى
   }
 
@@ -65,21 +64,37 @@ class BeautyMatchApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => SurveyProvider()),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
         ChangeNotifierProvider(create: (_) => RecommendationProvider()),
       ],
-      child: MaterialApp(
-        title: AppStrings.appName,
-        debugShowCheckedModeBanner: false,
-        theme: _buildTheme(),
-        home: SplashScreen(isFirstRun: isFirstRun),
-        builder: (context, child) {
-          return Directionality(
-            textDirection: TextDirection.rtl,
-            child: child!,
+      child: Consumer<AuthProvider>(
+        builder: (context, authProvider, child) {
+          return MaterialApp(
+            title: AppStrings.appName,
+            debugShowCheckedModeBanner: false,
+            theme: _buildTheme(),
+            home: FutureBuilder(
+              future: authProvider.initialize(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const SplashScreen(isFirstRun: false);
+                }
+                return SplashScreen(
+                  isFirstRun: isFirstRun,
+                  isAuthenticated: authProvider.isAuthenticated,
+                );
+              },
+            ),
+            builder: (context, child) {
+              return Directionality(
+                textDirection: TextDirection.rtl,
+                child: child!,
+              );
+            },
           );
         },
       ),

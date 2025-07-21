@@ -50,14 +50,23 @@ class SurveyProvider extends ChangeNotifier {
       _questions.isNotEmpty ? _questions[_currentQuestionIndex] : null;
 
   // Load survey questions
+// Load survey questions
   Future<void> loadQuestions() async {
     _setLoading(true);
     _error = null;
 
     try {
+      print('🔄 بدء تحميل أسئلة الاستطلاع...');
       _questions = await SurveyService.getAllQuestions();
+
       if (_questions.isEmpty) {
+        print('⚠️ لا توجد أسئلة في قاعدة البيانات');
         _error = 'لم يتم العثور على أسئلة الاستطلاع';
+      } else {
+        print('✅ تم تحميل ${_questions.length} سؤال بنجاح');
+        // إعادة تعيين المؤشر والإجابات
+        _currentQuestionIndex = 0;
+        _answers.clear();
       }
     } catch (e) {
       _error = 'خطأ في تحميل الأسئلة: $e';
@@ -66,7 +75,6 @@ class SurveyProvider extends ChangeNotifier {
 
     _setLoading(false);
   }
-
   // Answer current question
   void answerCurrentQuestion(String answer) {
     if (currentQuestion != null) {

@@ -1,4 +1,4 @@
-// lib/presentation/navigation/bottom_navigation.dart
+// lib/presentation/navigation/bottom_navigation.dart (Updated)
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -6,6 +6,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
 import '../../logic/providers/product_provider.dart';
 import '../../logic/providers/cart_provider.dart';
+import '../../logic/providers/uth_provider.dart';
 import '../screens/products/products_home_screen.dart';
 import '../screens/cart/cart_screen.dart';
 import '../screens/orders/orders_screen.dart';
@@ -32,10 +33,22 @@ class _BottomNavigationState extends State<BottomNavigation> {
 
     // Initialize providers
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ProductProvider>().initialize();
-      // TODO: Load cart for authenticated user
-      // context.read<CartProvider>().loadCart('user_id');
+      _initializeProviders();
     });
+  }
+
+  void _initializeProviders() {
+    final authProvider = context.read<AuthProvider>();
+    final productProvider = context.read<ProductProvider>();
+    final cartProvider = context.read<CartProvider>();
+
+    // Initialize products
+    productProvider.initialize();
+
+    // Load cart if user is authenticated
+    if (authProvider.isAuthenticated) {
+      cartProvider.loadCart(authProvider.userId);
+    }
   }
 
   @override
@@ -61,11 +74,11 @@ class _BottomNavigationState extends State<BottomNavigation> {
           ProfileScreen(),
         ],
       ),
-      bottomNavigationBar: Consumer<CartProvider>(
-        builder: (context, cartProvider, child) {
+      bottomNavigationBar: Consumer2<CartProvider, AuthProvider>(
+        builder: (context, cartProvider, authProvider, child) {
           return BottomNavigationBar(
             currentIndex: _currentIndex,
-            onTap: _onTabTapped,
+            onTap: (index) => _onTabTapped(index, authProvider),
             type: BottomNavigationBarType.fixed,
             backgroundColor: AppColors.surface,
             selectedItemColor: AppColors.primary,
@@ -88,9 +101,9 @@ class _BottomNavigationState extends State<BottomNavigation> {
                 activeIcon: Icon(Icons.shopping_bag),
                 label: AppStrings.orders,
               ),
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.person_outline),
-                activeIcon: Icon(Icons.person),
+              BottomNavigationBarItem(
+                icon: _buildProfileIcon(authProvider),
+                activeIcon: _buildProfileIcon(authProvider, isActive: true),
                 label: AppStrings.profile,
               ),
             ],
@@ -135,7 +148,46 @@ class _BottomNavigationState extends State<BottomNavigation> {
     );
   }
 
-  void _onTabTapped(int index) {
+  Widget _buildProfileIcon(AuthProvider authProvider, {bool isActive = false}) {
+    if (authProvider.isAuthenticated) {
+      return Stack(
+        children: [
+          Icon(
+            isActive ? Icons.person : Icons.person_outline,
+          ),
+          // Green dot to indicate logged in
+          Positioned(
+            right: 0,
+            top: 0,
+            child: Container(
+              width: 8,
+              height: 8,
+              decoration: BoxDecoration(
+                color: AppColors.success,
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(
+                  color: Colors.white,
+                  width: 1,
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Icon(
+      isActive ? Icons.person : Icons.person_outline,
+    );
+  }
+
+  void _onTabTapped(int index, AuthProvider authProvider) {
+    // Check if authentication is required for certain tabs
+    if ((index == 1 || index == 2) && !authProvider.isAuthenticated) {
+      _showLoginRequiredDialog(index);
+      return;
+    }
+
     setState(() {
       _currentIndex = index;
     });
@@ -143,6 +195,42 @@ class _BottomNavigationState extends State<BottomNavigation> {
       index,
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
+    );
+  }
+
+  void _showLoginRequiredDialog(int targetIndex) {
+    final String featureName = targetIndex == 1 ? 'السلة' : 'الطلبات';
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('تسجيل الدخول مطلوب'),
+        content: Text('لاستخدام $featureName، يجب تسجيل الدخول أولاً'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('إلغاء'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              // Navigate to profile screen which will show login option
+              setState(() {
+                _currentIndex = 3;
+              });
+              _pageController.animateToPage(
+                3,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
+            },
+            child: Text(
+              'تسجيل الدخول',
+              style: TextStyle(color: AppColors.primary),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -1,18 +1,22 @@
-
-// lib/presentation/screens/splash/splash_screen.dart
+// lib/presentation/screens/splash/splash_screen.dart (Updated)
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../navigation/bottom_navigation.dart';
 import '../welcome/welcome_screen.dart';
+import '../auth/login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   final bool isFirstRun;
+  final bool isAuthenticated;
 
-  const SplashScreen({Key? key, required this.isFirstRun}) : super(key: key);
+  const SplashScreen({
+    Key? key,
+    required this.isFirstRun,
+    this.isAuthenticated = false,
+  }) : super(key: key);
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -43,10 +47,22 @@ class _SplashScreenState extends State<SplashScreen>
     await Future.delayed(const Duration(seconds: 3));
 
     if (mounted) {
+      Widget destination;
+
+      if (widget.isFirstRun) {
+        // First time opening the app
+        destination = const WelcomeScreen();
+      } else if (widget.isAuthenticated) {
+        // User is already logged in
+        destination = const BottomNavigation();
+      } else {
+        // User needs to log in
+        destination = const LoginScreen();
+      }
+
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) =>
-          widget.isFirstRun ? const WelcomeScreen() : const BottomNavigation(),
+          pageBuilder: (context, animation, secondaryAnimation) => destination,
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(opacity: animation, child: child);
           },
@@ -154,7 +170,7 @@ class _SplashScreenState extends State<SplashScreen>
 
             // Loading Text
             Text(
-              AppStrings.loading,
+              _getLoadingText(),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Colors.white.withOpacity(0.8),
               ),
@@ -165,5 +181,15 @@ class _SplashScreenState extends State<SplashScreen>
         ),
       ),
     );
+  }
+
+  String _getLoadingText() {
+    if (widget.isFirstRun) {
+      return 'مرحباً بك في BeautyMatch...';
+    } else if (widget.isAuthenticated) {
+      return 'أهلاً بك مجدداً...';
+    } else {
+      return AppStrings.loading;
+    }
   }
 }

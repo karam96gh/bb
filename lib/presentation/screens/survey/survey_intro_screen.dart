@@ -60,7 +60,7 @@ class SurveyIntroScreen extends StatelessWidget {
 
           return Padding(
             padding: const EdgeInsets.all(24.0),
-            child: Column(
+            child: ListView(
               children: [
                 const SizedBox(height: 20),
 

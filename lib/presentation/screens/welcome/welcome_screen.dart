@@ -24,7 +24,7 @@ class WelcomeScreen extends StatelessWidget {
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Column(
+            child: ListView(
               children: [
                 const SizedBox(height: 60),
 
