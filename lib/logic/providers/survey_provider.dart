@@ -1,3 +1,4 @@
+// lib/logic/providers/survey_provider.dart (Fixed)
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -50,23 +51,14 @@ class SurveyProvider extends ChangeNotifier {
       _questions.isNotEmpty ? _questions[_currentQuestionIndex] : null;
 
   // Load survey questions
-// Load survey questions
   Future<void> loadQuestions() async {
     _setLoading(true);
     _error = null;
 
     try {
-      print('🔄 بدء تحميل أسئلة الاستطلاع...');
       _questions = await SurveyService.getAllQuestions();
-
       if (_questions.isEmpty) {
-        print('⚠️ لا توجد أسئلة في قاعدة البيانات');
         _error = 'لم يتم العثور على أسئلة الاستطلاع';
-      } else {
-        print('✅ تم تحميل ${_questions.length} سؤال بنجاح');
-        // إعادة تعيين المؤشر والإجابات
-        _currentQuestionIndex = 0;
-        _answers.clear();
       }
     } catch (e) {
       _error = 'خطأ في تحميل الأسئلة: $e';
@@ -75,11 +67,12 @@ class SurveyProvider extends ChangeNotifier {
 
     _setLoading(false);
   }
+
   // Answer current question
   void answerCurrentQuestion(String answer) {
     if (currentQuestion != null) {
       _answers['q$currentQuestionNumber'] = answer;
-      notifyListeners();
+      _safeNotifyListeners();
     }
   }
 
@@ -87,21 +80,21 @@ class SurveyProvider extends ChangeNotifier {
   void goToNextQuestion() {
     if (canGoNext) {
       _currentQuestionIndex++;
-      notifyListeners();
+      _safeNotifyListeners();
     }
   }
 
   void goToPreviousQuestion() {
     if (canGoPrevious) {
       _currentQuestionIndex--;
-      notifyListeners();
+      _safeNotifyListeners();
     }
   }
 
   void goToQuestion(int index) {
     if (index >= 0 && index < _questions.length) {
       _currentQuestionIndex = index;
-      notifyListeners();
+      _safeNotifyListeners();
     }
   }
 
@@ -109,7 +102,7 @@ class SurveyProvider extends ChangeNotifier {
   Future<bool> processSurveyResults(String userId) async {
     if (_questions.isEmpty || _answers.length != _questions.length) {
       _error = 'الرجاء الإجابة على جميع الأسئلة';
-      notifyListeners();
+      _safeNotifyListeners();
       return false;
     }
 
@@ -217,7 +210,7 @@ class SurveyProvider extends ChangeNotifier {
     _finalSkinType = AppConstants.normalSkin;
     _confidenceScore = 0.0;
     _error = null;
-    notifyListeners();
+    _safeNotifyListeners();
   }
 
   // Check if user has completed survey before
@@ -250,15 +243,22 @@ class SurveyProvider extends ChangeNotifier {
     return 'منخفضة';
   }
 
-  // Private helper methods
+  // Private helper methods (Fixed to avoid build-time issues)
   void _setLoading(bool loading) {
     _isLoading = loading;
-    notifyListeners();
+    _safeNotifyListeners();
+  }
+
+  void _safeNotifyListeners() {
+    // Use post frame callback to avoid calling notifyListeners during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
   }
 
   void clearError() {
     _error = null;
-    notifyListeners();
+    _safeNotifyListeners();
   }
 
   // Copy survey for updates

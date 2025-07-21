@@ -1,4 +1,4 @@
-// lib/logic/providers/auth_provider.dart
+// lib/logic/providers/auth_provider.dart (Fixed)
 import 'package:flutter/material.dart';
 import 'package:parse_server_sdk_flutter/parse_server_sdk_flutter.dart';
 
@@ -9,6 +9,7 @@ class AuthProvider extends ChangeNotifier {
   bool _isAuthenticated = false;
   ParseUser? _currentUser;
   bool _isLoading = false;
+  bool _isInitialized = false;
   String? _error;
 
   // User Data
@@ -23,6 +24,7 @@ class AuthProvider extends ChangeNotifier {
   bool get isAuthenticated => _isAuthenticated;
   ParseUser? get currentUser => _currentUser;
   bool get isLoading => _isLoading;
+  bool get isInitialized => _isInitialized;
   String? get error => _error;
 
   String get userId => _userId;
@@ -34,6 +36,8 @@ class AuthProvider extends ChangeNotifier {
 
   // Initialize authentication state
   Future<void> initialize() async {
+    if (_isInitialized) return;
+
     _setLoading(true);
 
     try {
@@ -49,6 +53,7 @@ class AuthProvider extends ChangeNotifier {
       print('❌ Error initializing auth: $e');
     }
 
+    _isInitialized = true;
     _setLoading(false);
   }
 
@@ -221,12 +226,13 @@ class AuthProvider extends ChangeNotifier {
         userId: _userId,
         preferences: {'profileCompleted': true},
       );
+      // Don't call notifyListeners here as it's already called in _setUserData
     }
 
     return success;
   }
 
-  // Set user data from ParseUser
+  // Set user data from ParseUser (fixed - avoid calling during build)
   void _setUserData(ParseUser user) {
     _currentUser = user;
     _userId = user.objectId ?? '';
@@ -235,10 +241,14 @@ class AuthProvider extends ChangeNotifier {
     _phone = user.get<String>('phone') ?? '';
     _skinType = user.get<String>('skinType') ?? '';
     _profileCompleted = user.get<bool>('profileCompleted') ?? false;
-    notifyListeners();
+
+    // Only notify listeners if not currently building
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
   }
 
-  // Clear user data
+  // Clear user data (fixed - avoid calling during build)
   void _clearUserData() {
     _currentUser = null;
     _userId = '';
@@ -247,19 +257,31 @@ class AuthProvider extends ChangeNotifier {
     _phone = '';
     _skinType = '';
     _profileCompleted = false;
-    notifyListeners();
+
+    // Only notify listeners if not currently building
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
   }
 
-  // Set loading state
+  // Set loading state (fixed - avoid calling during build)
   void _setLoading(bool loading) {
     _isLoading = loading;
-    notifyListeners();
+
+    // Only notify listeners if not currently building
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
   }
 
-  // Clear error
+  // Clear error (fixed - avoid calling during build)
   void _clearError() {
     _error = null;
-    notifyListeners();
+
+    // Only notify listeners if not currently building
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
   }
 
   // Clear error manually

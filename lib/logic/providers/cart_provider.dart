@@ -1,3 +1,4 @@
+// lib/logic/providers/cart_provider.dart (Fixed)
 import 'package:flutter/material.dart';
 
 import '../../data/models/cart_model.dart';
@@ -73,7 +74,7 @@ class CartProvider extends ChangeNotifier {
     } catch (e) {
       _error = 'خطأ في إضافة المنتج للسلة: $e';
       print('❌ Error adding to cart: $e');
-      notifyListeners();
+      _safeNotifyListeners();
       return false;
     }
   }
@@ -90,7 +91,7 @@ class CartProvider extends ChangeNotifier {
     } catch (e) {
       _error = 'خطأ في تحديث الكمية: $e';
       print('❌ Error updating quantity: $e');
-      notifyListeners();
+      _safeNotifyListeners();
       return false;
     }
   }
@@ -107,7 +108,7 @@ class CartProvider extends ChangeNotifier {
     } catch (e) {
       _error = 'خطأ في حذف المنتج: $e';
       print('❌ Error removing from cart: $e');
-      notifyListeners();
+      _safeNotifyListeners();
       return false;
     }
   }
@@ -125,7 +126,7 @@ class CartProvider extends ChangeNotifier {
     } catch (e) {
       _error = 'خطأ في إفراغ السلة: $e';
       print('❌ Error clearing cart: $e');
-      notifyListeners();
+      _safeNotifyListeners();
       return false;
     }
   }
@@ -153,7 +154,7 @@ class CartProvider extends ChangeNotifier {
         .fold(0, (sum, item) => sum + item.quantity);
   }
 
-  // Calculate cart summary
+  // Calculate cart summary (Fixed)
   void _calculateSummary() {
     _totalAmount = 0.0;
     _totalItems = 0;
@@ -164,14 +165,14 @@ class CartProvider extends ChangeNotifier {
       _totalItems += item.quantity;
     }
 
-    notifyListeners();
+    _safeNotifyListeners();
   }
 
   // Validate cart before checkout
   bool validateCart() {
     if (_cartItems.isEmpty) {
       _error = 'السلة فارغة';
-      notifyListeners();
+      _safeNotifyListeners();
       return false;
     }
 
@@ -179,7 +180,7 @@ class CartProvider extends ChangeNotifier {
     for (var item in _cartItems) {
       if (item.product?.isOutOfStock == true) {
         _error = 'المنتج ${item.product?.arabicName} غير متوفر حالياً';
-        notifyListeners();
+        _safeNotifyListeners();
         return false;
       }
     }
@@ -187,14 +188,21 @@ class CartProvider extends ChangeNotifier {
     return true;
   }
 
-  // Private helper methods
+  // Private helper methods (Fixed to avoid build-time issues)
   void _setLoading(bool loading) {
     _isLoading = loading;
-    notifyListeners();
+    _safeNotifyListeners();
+  }
+
+  void _safeNotifyListeners() {
+    // Use post frame callback to avoid calling notifyListeners during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
   }
 
   void clearError() {
     _error = null;
-    notifyListeners();
+    _safeNotifyListeners();
   }
 }

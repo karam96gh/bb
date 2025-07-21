@@ -1,11 +1,12 @@
-// lib/logic/providers/product_provider.dart
+// lib/logic/providers/product_provider.dart (Fixed excerpt)
 import 'package:flutter/material.dart';
 
 import '../../data/models/product_model.dart';
 import '../../data/models/category_model.dart';
 import '../../data/services/product_service.dart';
+import 'provider_base_mixin.dart';
 
-class ProductProvider extends ChangeNotifier {
+class ProductProvider extends ChangeNotifier with SafeNotifierMixin {
   // Products State
   List<Product> _allProducts = [];
   List<Product> _filteredProducts = [];
@@ -77,7 +78,7 @@ class ProductProvider extends ChangeNotifier {
   Future<void> loadCategories() async {
     try {
       _categories = await ProductService.getAllCategories();
-      notifyListeners();
+      safeNotifyListeners();
     } catch (e) {
       print('❌ Error loading categories: $e');
     }
@@ -87,7 +88,7 @@ class ProductProvider extends ChangeNotifier {
   Future<void> loadFeaturedProducts() async {
     try {
       _featuredProducts = await ProductService.getFeaturedProducts(limit: 10);
-      notifyListeners();
+      safeNotifyListeners();
     } catch (e) {
       print('❌ Error loading featured products: $e');
     }
@@ -141,7 +142,7 @@ class ProductProvider extends ChangeNotifier {
     if (_isLoadingMore || !_hasMoreProducts) return;
 
     _isLoadingMore = true;
-    notifyListeners();
+    safeNotifyListeners();
 
     try {
       final products = await ProductService.getAllProducts(
@@ -164,7 +165,7 @@ class ProductProvider extends ChangeNotifier {
     }
 
     _isLoadingMore = false;
-    notifyListeners();
+    safeNotifyListeners();
   }
 
   // Search products
@@ -212,7 +213,7 @@ class ProductProvider extends ChangeNotifier {
         break;
     }
 
-    notifyListeners();
+    safeNotifyListeners();
   }
 
   // Get product by ID
@@ -285,14 +286,14 @@ class ProductProvider extends ChangeNotifier {
     await initialize();
   }
 
-  // Private helper methods
+  // Private helper methods (Fixed)
   void _setLoading(bool loading) {
     _isLoading = loading;
-    notifyListeners();
+    safeNotifyListeners();
   }
 
   void clearError() {
     _error = null;
-    notifyListeners();
+    safeNotifyListeners();
   }
 }
