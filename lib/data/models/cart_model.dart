@@ -1,4 +1,4 @@
-// lib/data/models/cart_model.dart
+// lib/data/models/cart_model.dart - مُصلح
 import 'package:beauty/data/models/product_model.dart';
 
 class CartItem {
@@ -43,11 +43,14 @@ class CartItem {
       return '';
     }
 
-    // Helper function to extract product object
+    // Helper function to extract product object - مُحسن
     Product? extractProduct(dynamic productField) {
-      if (productField is Map<String, dynamic> && productField.containsKey('objectId')) {
+      if (productField is Map<String, dynamic>) {
         try {
-          return Product.fromJson(productField);
+          // التأكد من وجود objectId
+          if (productField.containsKey('objectId')) {
+            return Product.fromJson(productField);
+          }
         } catch (e) {
           print('❌ Error parsing product: $e');
           return null;
@@ -89,8 +92,14 @@ class CartItem {
     };
   }
 
-  // Helper methods
-  double get totalPrice => product != null ? product!.price * quantity : 0.0;
+  // Helper methods - مُحسن لحل مشكلة السعر صفر
+  double get totalPrice {
+    if (product != null && product!.price > 0) {
+      return product!.price * quantity;
+    }
+    return 0.0;
+  }
+
   String get displayTotalPrice => '${totalPrice.toStringAsFixed(0)} ر.س';
 
   CartItem copyWith({

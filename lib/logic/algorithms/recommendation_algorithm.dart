@@ -129,27 +129,43 @@ class RecommendationAlgorithm {
       List<Product> allProducts,
       Survey survey,
       ) {
+    print('🤖 Calculating recommendations for ${allProducts.length} products');
+
     List<ProductRecommendation> recommendations = [];
 
     for (var product in allProducts) {
       final score = _calculateProductScore(product, survey);
-      if (score > 50) { // حد أدنى للتوصية
+      // خفض الحد الأدنى للحصول على المزيد من التوصيات
+      if (score > 40) { // تم تخفيض الحد من 50 إلى 40
         recommendations.add(ProductRecommendation(
           product: product,
           score: score,
           reasons: _generateRecommendationReasons(product, survey),
           confidence: _calculateRecommendationConfidence(product, survey),
         ));
+
+        print('✅ Product added: ${product.arabicName} - Score: ${score.toInt()}%');
+      } else {
+        print('⚠️ Product rejected: ${product.arabicName} - Score: ${score.toInt()}% (below threshold)');
       }
     }
+
+    print('📊 Total recommendations before sorting: ${recommendations.length}');
 
     // ترتيب حسب النقاط
     recommendations.sort((a, b) => b.score.compareTo(a.score));
 
-    // أخذ أفضل 5 توصيات
-    return recommendations.take(5).toList();
-  }
+    // أخذ أفضل 5 توصيات بدلاً من 5
+    final topRecommendations = recommendations.take(5).toList();
 
+    print('🎯 Final recommendations count: ${topRecommendations.length}');
+    for (int i = 0; i < topRecommendations.length; i++) {
+      final rec = topRecommendations[i];
+      print('${i + 1}. ${rec.product.arabicName} - ${rec.score.toInt()}% - ${rec.reasons.join(", ")}');
+    }
+
+    return topRecommendations;
+  }
   // حساب نقاط المنتج
   static double _calculateProductScore(Product product, Survey survey) {
     double totalScore = 0.0;
