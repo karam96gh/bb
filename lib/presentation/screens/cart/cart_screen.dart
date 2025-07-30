@@ -1,4 +1,4 @@
-// lib/presentation/screens/cart/cart_screen.dart
+// lib/presentation/screens/cart/cart_screen.dart - مُصلح
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -6,8 +6,10 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../logic/providers/cart_provider.dart';
+import '../../../logic/providers/uth_provider.dart';
 import '../../../data/models/cart_model.dart';
 import 'checkout_screen.dart';
+import '../auth/login_screen.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({Key? key}) : super(key: key);
@@ -20,11 +22,19 @@ class _CartScreenState extends State<CartScreen> {
   @override
   void initState() {
     super.initState();
-    // Load cart data
+    // Load cart data after build
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // TODO: Get actual user ID from authentication
-      context.read<CartProvider>().loadCart('temp_user_id');
+      _loadUserCart();
     });
+  }
+
+  void _loadUserCart() {
+    final authProvider = context.read<AuthProvider>();
+    final cartProvider = context.read<CartProvider>();
+
+    if (authProvider.isAuthenticated) {
+      cartProvider.loadCart(authProvider.userId);
+    }
   }
 
   @override
@@ -37,11 +47,11 @@ class _CartScreenState extends State<CartScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
-          Consumer<CartProvider>(
-            builder: (context, cartProvider, child) {
-              if (cartProvider.cartItems.isNotEmpty) {
+          Consumer2<CartProvider, AuthProvider>(
+            builder: (context, cartProvider, authProvider, child) {
+              if (authProvider.isAuthenticated && cartProvider.cartItems.isNotEmpty) {
                 return TextButton(
-                  onPressed: () => _showClearCartDialog(cartProvider),
+                  onPressed: () => _showClearCartDialog(cartProvider, authProvider),
                   child: Text(
                     'إفراغ',
                     style: TextStyle(color: AppColors.error),
@@ -53,8 +63,13 @@ class _CartScreenState extends State<CartScreen> {
           ),
         ],
       ),
-      body: Consumer<CartProvider>(
-        builder: (context, cartProvider, child) {
+      body: Consumer2<CartProvider, AuthProvider>(
+        builder: (context, cartProvider, authProvider, child) {
+          // Check if user is authenticated
+          if (!authProvider.isAuthenticated) {
+            return _buildLoginRequired();
+          }
+
           if (cartProvider.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -67,14 +82,75 @@ class _CartScreenState extends State<CartScreen> {
             children: [
               // Cart Items
               Expanded(
-                child: _buildCartList(cartProvider),
+                child: _buildCartList(cartProvider, authProvider),
               ),
 
               // Summary and Checkout
-              _buildBottomSection(cartProvider),
+              _buildBottomSection(cartProvider, authProvider),
             ],
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildLoginRequired() {
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.login,
+            size: 120,
+            color: AppColors.onSurfaceVariant.withOpacity(0.5),
+          ),
+
+          const SizedBox(height: 32),
+
+          Text(
+            'تسجيل الدخول مطلوب',
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              color: AppColors.onSurface,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          Text(
+            'لاستخدام السلة وإتمام الطلبات، يجب تسجيل الدخول أولاً',
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              color: AppColors.onSurfaceVariant,
+              height: 1.5,
+            ),
+            textAlign: TextAlign.center,
+          ),
+
+          const SizedBox(height: 40),
+
+          SizedBox(
+            width: 200,
+            child: ElevatedButton(
+              onPressed: () => _navigateToLogin(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                'تسجيل الدخول',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -157,7 +233,7 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-  Widget _buildCartList(CartProvider cartProvider) {
+  Widget _buildCartList(CartProvider cartProvider, AuthProvider authProvider) {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: cartProvider.cartItems.length,
@@ -165,7 +241,7 @@ class _CartScreenState extends State<CartScreen> {
         final cartItem = cartProvider.cartItems[index];
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
-          child: _buildCartItemCard(cartItem, cartProvider),
+          child: _buildCartItemCard(cartItem, cartProvider, authProvider),
         )
             .animate(delay: Duration(milliseconds: 100 + (index * 50)))
             .slideX(
@@ -178,7 +254,7 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-  Widget _buildCartItemCard(CartItem cartItem, CartProvider cartProvider) {
+  Widget _buildCartItemCard(CartItem cartItem, CartProvider cartProvider, AuthProvider authProvider) {
     final product = cartItem.product;
     if (product == null) return const SizedBox.shrink();
 
@@ -216,6 +292,15 @@ class _CartScreenState extends State<CartScreen> {
                     Icons.shopping_bag,
                     color: AppColors.onSurfaceVariant,
                     size: 32,
+                  );
+                },
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: AppColors.primary,
+                      strokeWidth: 2,
+                    ),
                   );
                 },
               )
@@ -277,7 +362,7 @@ class _CartScreenState extends State<CartScreen> {
                     ),
 
                     // Quantity Controls
-                    _buildQuantityControls(cartItem, cartProvider),
+                    _buildQuantityControls(cartItem, cartProvider, authProvider),
                   ],
                 ),
               ],
@@ -286,7 +371,7 @@ class _CartScreenState extends State<CartScreen> {
 
           // Remove Button
           IconButton(
-            onPressed: () => _removeItem(cartItem, cartProvider),
+            onPressed: () => _removeItem(cartItem, cartProvider, authProvider),
             icon: Icon(
               Icons.delete_outline,
               color: AppColors.error,
@@ -297,7 +382,7 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-  Widget _buildQuantityControls(CartItem cartItem, CartProvider cartProvider) {
+  Widget _buildQuantityControls(CartItem cartItem, CartProvider cartProvider, AuthProvider authProvider) {
     return Row(
       children: [
         // Decrease Button
@@ -308,7 +393,7 @@ class _CartScreenState extends State<CartScreen> {
           ),
           child: InkWell(
             onTap: cartItem.quantity > 1
-                ? () => _updateQuantity(cartItem, cartItem.quantity - 1, cartProvider)
+                ? () => _updateQuantity(cartItem, cartItem.quantity - 1, cartProvider, authProvider)
                 : null,
             child: Container(
               width: 32,
@@ -343,7 +428,7 @@ class _CartScreenState extends State<CartScreen> {
             borderRadius: BorderRadius.circular(8),
           ),
           child: InkWell(
-            onTap: () => _updateQuantity(cartItem, cartItem.quantity + 1, cartProvider),
+            onTap: () => _updateQuantity(cartItem, cartItem.quantity + 1, cartProvider, authProvider),
             child: Container(
               width: 32,
               height: 32,
@@ -359,7 +444,7 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-  Widget _buildBottomSection(CartProvider cartProvider) {
+  Widget _buildBottomSection(CartProvider cartProvider, AuthProvider authProvider) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -426,11 +511,11 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-  void _updateQuantity(CartItem cartItem, int newQuantity, CartProvider cartProvider) async {
-    await cartProvider.updateQuantity('temp_user_id', cartItem.objectId, newQuantity);
+  void _updateQuantity(CartItem cartItem, int newQuantity, CartProvider cartProvider, AuthProvider authProvider) async {
+    await cartProvider.updateQuantity(authProvider.userId, cartItem.objectId, newQuantity);
   }
 
-  void _removeItem(CartItem cartItem, CartProvider cartProvider) async {
+  void _removeItem(CartItem cartItem, CartProvider cartProvider, AuthProvider authProvider) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -453,11 +538,11 @@ class _CartScreenState extends State<CartScreen> {
     );
 
     if (confirmed == true) {
-      await cartProvider.removeFromCart('temp_user_id', cartItem.objectId);
+      await cartProvider.removeFromCart(authProvider.userId, cartItem.objectId);
     }
   }
 
-  void _showClearCartDialog(CartProvider cartProvider) {
+  void _showClearCartDialog(CartProvider cartProvider, AuthProvider authProvider) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -471,7 +556,7 @@ class _CartScreenState extends State<CartScreen> {
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
-              await cartProvider.clearCart('temp_user_id');
+              await cartProvider.clearCart(authProvider.userId);
             },
             child: Text(
               'إفراغ',
@@ -487,6 +572,14 @@ class _CartScreenState extends State<CartScreen> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => CheckoutScreen(cartItems: cartProvider.cartItems),
+      ),
+    );
+  }
+
+  void _navigateToLogin() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const LoginScreen(),
       ),
     );
   }

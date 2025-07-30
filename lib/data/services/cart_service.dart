@@ -51,7 +51,7 @@ class CartService {
       final query = Back4AppService.buildQuery<ParseObject>(AppConstants.cartTable);
       query.whereEqualTo('user', ParseObject(AppConstants.usersTable)..objectId = userId);
       query.whereEqualTo('product', ParseObject(AppConstants.productsTable)..objectId = productId);
-      query.whereEqualTo('selectedColor', color);
+     // query.whereEqualTo('selectedColor', color);
 
       final results = await Back4AppService.queryWithConditions(query);
       if (results.isNotEmpty) {

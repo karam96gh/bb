@@ -1,13 +1,15 @@
-// lib/data/seed/products_seed.dart
+// lib/data/seed/products_seed.dart - منتجات أكثر تنوعاً
 class ProductsSeedData {
   static List<Map<String, dynamic>> getProducts() {
     return [
-      // أحمر الشفاه المطفي من لوريال
+      // ===== أحمر الشفاه =====
+
+      // L'Oréal منتجات
       {
         'name': "L'Oréal Color Riche Matte Lipstick",
         'arabicName': "أحمر شفاه لوريال كولور ريتش مات",
-        'description': "Creamy matte lipstick enriched with colors and hydration. Covers lips with a smooth layer that lasts for hours, provides saturated color without drying the lips. Contains Vitamin E and Jojoba oil for moisturizing and protecting lips.",
-        'arabicDescription': "حمرة شفاه كريمية بتركيبة مطفية غنية بالألوان والترطيب. تغطي الشفاه بطبقة ناعمة تدوم لساعات، تمنح لونًا مشبعًا دون تجفيف الشفاه. تحتوي على فيتامين E وزيت الجوجوبا لترطيب وحماية الشفاه.",
+        'description': "Creamy matte lipstick enriched with colors and hydration. Covers lips with a smooth layer that lasts for hours, provides saturated color without drying the lips.",
+        'arabicDescription': "حمرة شفاه كريمية بتركيبة مطفية غنية بالألوان والترطيب. تغطي الشفاه بطبقة ناعمة تدوم لساعات، تمنح لونًا مشبعًا دون تجفيف الشفاه.",
         'category': 'lipstick',
         'brand': "L'Oréal",
         'price': 75.0,
@@ -16,33 +18,13 @@ class ProductsSeedData {
           'https://images.unsplash.com/photo-1631214540242-3b0a9e61fa5c?w=400'
         ],
         'colors': [
-          {
-            'name': 'Nude Beige',
-            'arabicName': 'بيج',
-            'hexCode': '#D2B48C',
-            'isAvailable': true
-          },
-          {
-            'name': 'Soft Pink',
-            'arabicName': 'وردي كاشف',
-            'hexCode': '#FFB6C1',
-            'isAvailable': true
-          },
-          {
-            'name': 'Deep Rose',
-            'arabicName': 'وردي غامق',
-            'hexCode': '#C71585',
-            'isAvailable': true
-          }
+          {'name': 'Nude Beige', 'arabicName': 'بيج طبيعي', 'hexCode': '#D2B48C', 'isAvailable': true},
+          {'name': 'Soft Pink', 'arabicName': 'وردي ناعم', 'hexCode': '#FFB6C1', 'isAvailable': true},
+          {'name': 'Deep Rose', 'arabicName': 'وردي غامق', 'hexCode': '#C71585', 'isAvailable': true},
+          {'name': 'Classic Red', 'arabicName': 'أحمر كلاسيكي', 'hexCode': '#DC143C', 'isAvailable': true},
         ],
         'skinTypes': ['oily', 'combination', 'normal'],
-        'suitableFor': {
-          'oily': 90,
-          'dry': 80,
-          'combination': 95,
-          'sensitive': 85,
-          'normal': 90
-        },
+        'suitableFor': {'oily': 90, 'dry': 80, 'combination': 95, 'sensitive': 85, 'normal': 90},
         'features': ['long_lasting', 'moisturizing', 'vitamin_e', 'jojoba_oil'],
         'ingredients': 'فيتامين E، زيت الجوجوبا، أصباغ طبيعية، شمع طبيعي',
         'usage': 'يطبق مباشرة على الشفاه النظيفة. للثبات الأطول، استخدمي مرطب شفاه قبل التطبيق بـ 5 دقائق.',
@@ -56,48 +38,23 @@ class ProductsSeedData {
         'reviewsCount': 127
       },
 
-      // أحمر الشفاه السائل المطفي
       {
         'name': "L'Oréal Infallible Pro-Matte Liquid Lipstick",
         'arabicName': "أحمر شفاه لوريال إنفاليبل برو مات السائل",
-        'description': "Long-lasting liquid lipstick with completely matte formula. Adheres well to lips and provides rich, stable color that lasts for hours with smudge resistance.",
-        'arabicDescription': "حمرة شفاه سائلة طويلة الثبات بتركيبة مطفية تماما. تلتصق جيدًا بالشفاه وتمنح لونًا غنيًا وثابتًا يدوم لساعات مع مقاومة التلطخ.",
+        'description': "Long-lasting liquid lipstick with completely matte formula. Ultra-pigmented for full coverage that won't budge.",
+        'arabicDescription': "حمرة شفاه سائلة طويلة الثبات بتركيبة مطفية تماماً. فائقة التصبغ للحصول على تغطية كاملة لا تتحرك.",
         'category': 'lipstick',
         'brand': "L'Oréal",
         'price': 85.0,
-        'images': [
-          'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400',
-          'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400'
-        ],
+        'images': ['https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400'],
         'colors': [
-          {
-            'name': 'Classic Beige',
-            'arabicName': 'بيج كلاسيكي',
-            'hexCode': '#D2B48C',
-            'isAvailable': true
-          },
-          {
-            'name': 'Rose Pink',
-            'arabicName': 'وردي كاشف',
-            'hexCode': '#FFB6C1',
-            'isAvailable': true
-          },
-          {
-            'name': 'Bold Rose',
-            'arabicName': 'وردي غامق',
-            'hexCode': '#C71585',
-            'isAvailable': true
-          }
+          {'name': 'Statement Nude', 'arabicName': 'بيج جريء', 'hexCode': '#C8A882', 'isAvailable': true},
+          {'name': 'Bold Berry', 'arabicName': 'توتي جريء', 'hexCode': '#8B0000', 'isAvailable': true},
+          {'name': 'Fierce Fuchsia', 'arabicName': 'زهري شرس', 'hexCode': '#FF1493', 'isAvailable': true},
         ],
         'skinTypes': ['oily', 'combination'],
-        'suitableFor': {
-          'oily': 95,
-          'dry': 65,
-          'combination': 90,
-          'sensitive': 70,
-          'normal': 85
-        },
-        'features': ['ultra_long_lasting', 'smudge_proof', 'transfer_resistant'],
+        'suitableFor': {'oily': 95, 'dry': 65, 'combination': 90, 'sensitive': 70, 'normal': 85},
+        'features': ['ultra_long_lasting', 'smudge_proof', 'transfer_resistant', 'full_coverage'],
         'ingredients': 'بوليمرات طويلة الثبات، أصباغ مقاومة للماء، مواد مثبتة',
         'usage': 'يطبق بطبقة رقيقة على الشفاه النظيفة. تجنبي فرك الشفاه بعد التطبيق لمدة دقيقتين.',
         'benefits': ['ثبات 8+ ساعات', 'مقاومة التلطخ', 'لون غني', 'مقاوم للماء'],
@@ -110,101 +67,112 @@ class ProductsSeedData {
         'reviewsCount': 89
       },
 
-      // أحمر الشفاه اللامع
+      // MAC منتجات
       {
-        'name': "L'Oréal Color Riche Shine Lipstick",
-        'arabicName': "أحمر شفاه لوريال كولور ريتش شاين",
-        'description': "Glossy lipstick with moisturizing and smooth formula, gives lips a sparkling touch with transparent and radiant color. Suitable for daily use with light texture.",
-        'arabicDescription': "حمرة شفاه لامعة بتركيبة مرطبة وناعمة، تمنح شفاهك لمسة براقة مع لون شفاف ومتوهج. مناسبة للاستعمال اليومي مع ملمس خفيف.",
+        'name': "MAC Ruby Woo Lipstick",
+        'arabicName': "أحمر شفاه ماك روبي وو",
+        'description': "Iconic matte red lipstick with intense color payoff. A true red shade that complements all skin tones.",
+        'arabicDescription': "أحمر شفاه أحمر مطفي أيقوني مع كثافة لون عالية. درجة حمراء حقيقية تناسب جميع ألوان البشرة.",
         'category': 'lipstick',
-        'brand': "L'Oréal",
-        'price': 70.0,
-        'images': [
-          'https://images.unsplash.com/photo-1631214540242-3b0a9e61fa5c?w=400',
-          'https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=400'
-        ],
+        'brand': 'MAC',
+        'price': 120.0,
+        'images': ['https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=400'],
         'colors': [
-          {
-            'name': 'Natural Beige',
-            'arabicName': 'بيج طبيعي',
-            'hexCode': '#D2B48C',
-            'isAvailable': true
-          },
-          {
-            'name': 'Sheer Pink',
-            'arabicName': 'وردي شفاف',
-            'hexCode': '#FFB6C1',
-            'isAvailable': true
-          },
-          {
-            'name': 'Coral Pink',
-            'arabicName': 'وردي مرجاني',
-            'hexCode': '#FF7F7F',
-            'isAvailable': true
-          }
+          {'name': 'Ruby Woo', 'arabicName': 'روبي وو', 'hexCode': '#D2001F', 'isAvailable': true},
+        ],
+        'skinTypes': ['all'],
+        'suitableFor': {'oily': 88, 'dry': 75, 'combination': 85, 'sensitive': 80, 'normal': 90},
+        'features': ['iconic_shade', 'matte_finish', 'long_lasting', 'high_pigment'],
+        'ingredients': 'شموع طبيعية، أصباغ عالية الجودة، مواد مرطبة',
+        'usage': 'يطبق مباشرة من الأنبوب أو باستخدام فرشاة شفاه للحصول على دقة أكبر.',
+        'benefits': ['لون أحمر كلاسيكي', 'ثبات ممتاز', 'يناسب جميع المناسبات', 'تغطية كاملة'],
+        'problems_solved': ['lack_of_color', 'fading', 'special_occasions'],
+        'occasion': ['evening', 'special_events', 'professional'],
+        'finish': 'matte',
+        'isActive': true,
+        'stockStatus': 'in_stock',
+        'rating': 4.7,
+        'reviewsCount': 245
+      },
+
+      {
+        'name': "MAC Lustre Lipstick",
+        'arabicName': "أحمر شفاه ماك لاستر",
+        'description': "Creamy lipstick with lustrous finish. Provides comfortable wear with beautiful shine and medium coverage.",
+        'arabicDescription': "أحمر شفاه كريمي بلمسة نهائية لامعة. يوفر راحة في الاستخدام مع بريق جميل وتغطية متوسطة.",
+        'category': 'lipstick',
+        'brand': 'MAC',
+        'price': 115.0,
+        'images': ['https://images.unsplash.com/photo-1631214540242-3b0a9e61fa5c?w=400'],
+        'colors': [
+          {'name': 'Hue', 'arabicName': 'هيو', 'hexCode': '#FF69B4', 'isAvailable': true},
+          {'name': 'See Sheer', 'arabicName': 'سي شير', 'hexCode': '#FFB6C1', 'isAvailable': true},
+          {'name': 'Lustering', 'arabicName': 'لاسترنغ', 'hexCode': '#FF1493', 'isAvailable': true},
         ],
         'skinTypes': ['dry', 'normal', 'sensitive'],
-        'suitableFor': {
-          'oily': 70,
-          'dry': 90,
-          'combination': 80,
-          'sensitive': 85,
-          'normal': 90
-        },
-        'features': ['moisturizing', 'glossy_finish', 'lightweight', 'nourishing'],
-        'ingredients': 'زيوت طبيعية، مرطبات، أصباغ شفافة، فيتامين E',
-        'usage': 'يطبق مباشرة على الشفاه أو فوق مرطب شفاه للمعان إضافي.',
-        'benefits': ['ترطيب فوري', 'لمعان طبيعي', 'ملمس خفيف', 'لون شفاف جميل'],
-        'problems_solved': ['dry_lips', 'dull_color'],
+        'suitableFor': {'oily': 70, 'dry': 95, 'combination': 80, 'sensitive': 90, 'normal': 88},
+        'features': ['lustrous_finish', 'moisturizing', 'comfortable_wear', 'buildable_coverage'],
+        'ingredients': 'زيوت مرطبة، شموع طبيعية، أصباغ ناعمة',
+        'usage': 'يطبق مباشرة على الشفاه. يمكن بناء الكثافة بطبقات متعددة.',
+        'benefits': ['ترطيب فائق', 'بريق طبيعي', 'راحة طوال اليوم', 'ألوان قابلة للبناء'],
+        'problems_solved': ['dry_lips', 'dullness', 'comfort'],
         'occasion': ['daily', 'casual', 'daytime'],
-        'finish': 'glossy',
+        'finish': 'lustrous',
+        'isActive': true,
+        'stockStatus': 'in_stock',
+        'rating': 4.4,
+        'reviewsCount': 167
+      },
+
+      // Maybelline منتجات
+      {
+        'name': "Maybelline SuperStay Matte Ink",
+        'arabicName': "أحمر شفاه مايبلين سوبر ستاي مات إنك",
+        'description': "Liquid matte lipstick that delivers bold, saturated color that lasts up to 16 hours. Transfer-resistant formula.",
+        'arabicDescription': "أحمر شفاه سائل مطفي يمنح لون جريء ومشبع يدوم حتى 16 ساعة. تركيبة مقاومة للنقل.",
+        'category': 'lipstick',
+        'brand': 'Maybelline',
+        'price': 65.0,
+        'images': ['https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400'],
+        'colors': [
+          {'name': 'Pioneer', 'arabicName': 'بايونير', 'hexCode': '#8B4513', 'isAvailable': true},
+          {'name': 'Lover', 'arabicName': 'لوفر', 'hexCode': '#FF69B4', 'isAvailable': true},
+          {'name': 'Artist', 'arabicName': 'آرتست', 'hexCode': '#DC143C', 'isAvailable': true},
+          {'name': 'Dreamer', 'arabicName': 'دريمر', 'hexCode': '#DDA0DD', 'isAvailable': true},
+        ],
+        'skinTypes': ['oily', 'combination', 'normal'],
+        'suitableFor': {'oily': 92, 'dry': 70, 'combination': 88, 'sensitive': 75, 'normal': 85},
+        'features': ['16_hour_wear', 'transfer_resistant', 'smudge_proof', 'high_pigment'],
+        'ingredients': 'تركيبة SuperStay، أصباغ عالية الكثافة، بوليمرات مقاومة',
+        'usage': 'يطبق من الوسط إلى الخارج. انتظري حتى يجف تماماً قبل إغلاق الشفاه.',
+        'benefits': ['ثبات 16 ساعة', 'مقاوم للنقل', 'لون مكثف', 'سعر معقول'],
+        'problems_solved': ['transfer', 'fading', 'smudging', 'long_wear_need'],
+        'occasion': ['daily', 'professional', 'evening'],
+        'finish': 'matte',
         'isActive': true,
         'stockStatus': 'in_stock',
         'rating': 4.2,
-        'reviewsCount': 156
+        'reviewsCount': 312
       },
 
-      // بلسم الشفاه المتوهج
+      // ===== بلسم الشفاه =====
+
       {
         'name': "L'Oréal Glow Paradise Balm-in-Lipstick",
         'arabicName': "بلسم الشفاه المتوهج من لوريال",
-        'description': "Balm-in-lipstick provides instant and intensive hydration with 92% natural ingredients formula, pomegranate extract works to nourish and soothe lips.",
-        'arabicDescription': "بلسم شفاه يوفر ترطيب فوري ومكثّف بفضل تركيبة 92% مكوّنات طبيعية، مستخلص الرمان يعمل على تغذية الشفاه وتلطيفها.",
+        'description': "Balm-in-lipstick provides instant and intensive hydration with 92% natural ingredients formula.",
+        'arabicDescription': "بلسم شفاه يوفر ترطيب فوري ومكثّف بفضل تركيبة 92% مكوّنات طبيعية.",
         'category': 'lip_balm',
         'brand': "L'Oréal",
         'price': 65.0,
-        'images': [
-          'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400',
-          'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400'
-        ],
+        'images': ['https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400'],
         'colors': [
-          {
-            'name': 'Natural Clear',
-            'arabicName': 'شفاف طبيعي',
-            'hexCode': '#FFE4E1',
-            'isAvailable': true
-          },
-          {
-            'name': 'Tinted Pink',
-            'arabicName': 'وردي ملون',
-            'hexCode': '#FFB6C1',
-            'isAvailable': true
-          },
-          {
-            'name': 'Berry Tint',
-            'arabicName': 'توتي فاتح',
-            'hexCode': '#FF69B4',
-            'isAvailable': true
-          }
+          {'name': 'Natural Clear', 'arabicName': 'شفاف طبيعي', 'hexCode': '#FFE4E1', 'isAvailable': true},
+          {'name': 'Tinted Pink', 'arabicName': 'وردي ملون', 'hexCode': '#FFB6C1', 'isAvailable': true},
+          {'name': 'Berry Tint', 'arabicName': 'توتي فاتح', 'hexCode': '#FF69B4', 'isAvailable': true},
         ],
         'skinTypes': ['dry', 'sensitive', 'normal', 'combination'],
-        'suitableFor': {
-          'oily': 75,
-          'dry': 95,
-          'combination': 85,
-          'sensitive': 98,
-          'normal': 95
-        },
+        'suitableFor': {'oily': 75, 'dry': 95, 'combination': 85, 'sensitive': 98, 'normal': 95},
         'features': ['natural_ingredients', 'pomegranate_extract', 'intensive_moisturizing', 'dermatologically_tested'],
         'ingredients': '92% مكونات طبيعية، مستخلص الرمان، زبدة الشيا، زيت جوز الهند',
         'usage': 'يطبق عدة مرات يومياً حسب الحاجة. يمكن استخدامه كقاعدة قبل أحمر الشفاه.',
@@ -218,146 +186,229 @@ class ProductsSeedData {
         'reviewsCount': 203
       },
 
-      // مسكرة لاش بارادايس
+      {
+        'name': "Nivea Essential Care Lip Balm",
+        'arabicName': "بلسم الشفاه العناية الأساسية من نيفيا",
+        'description': "Classic lip balm with shea butter and vanilla extract. Provides 24-hour moisture protection for soft, smooth lips.",
+        'arabicDescription': "بلسم شفاه كلاسيكي بزبدة الشيا ومستخلص الفانيليا. يوفر حماية ترطيب لمدة 24 ساعة للحصول على شفاه ناعمة.",
+        'category': 'lip_balm',
+        'brand': 'Nivea',
+        'price': 25.0,
+        'images': ['https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400'],
+        'colors': [
+          {'name': 'Classic', 'arabicName': 'كلاسيكي', 'hexCode': '#F5F5DC', 'isAvailable': true},
+        ],
+        'skinTypes': ['all'],
+        'suitableFor': {'oily': 80, 'dry': 92, 'combination': 85, 'sensitive': 88, 'normal': 90},
+        'features': ['24_hour_moisture', 'shea_butter', 'vanilla_extract', 'affordable'],
+        'ingredients': 'زبدة الشيا، مستخلص الفانيليا، شمع النحل، فيتامين E',
+        'usage': 'يطبق حسب الحاجة على الشفاه الجافة أو المتشققة.',
+        'benefits': ['ترطيب 24 ساعة', 'حماية من العوامل الخارجية', 'سعر اقتصادي', 'متوفر دائماً'],
+        'problems_solved': ['dry_lips', 'weather_protection', 'daily_care'],
+        'occasion': ['daily', 'protection', 'basic_care'],
+        'finish': 'natural',
+        'isActive': true,
+        'stockStatus': 'in_stock',
+        'rating': 4.1,
+        'reviewsCount': 520
+      },
+
+      {
+        'name': "Burt's Bees Original Beeswax Lip Balm",
+        'arabicName': "بلسم الشفاه الأصلي بشمع النحل من بيرتس بيز",
+        'description': "100% natural lip balm with beeswax, vitamin E, and peppermint oil. Nourishes and conditions lips naturally.",
+        'arabicDescription': "بلسم شفاه طبيعي 100% بشمع النحل وفيتامين E وزيت النعناع. يغذي ويرطب الشفاه بشكل طبيعي.",
+        'category': 'lip_balm',
+        'brand': "Burt's Bees",
+        'price': 45.0,
+        'images': ['https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400'],
+        'colors': [
+          {'name': 'Original', 'arabicName': 'أصلي', 'hexCode': '#F0E68C', 'isAvailable': true},
+        ],
+        'skinTypes': ['all'],
+        'suitableFor': {'oily': 78, 'dry': 88, 'combination': 82, 'sensitive': 95, 'normal': 85},
+        'features': ['100_natural', 'beeswax', 'vitamin_e', 'peppermint_oil', 'eco_friendly'],
+        'ingredients': 'شمع النحل، زيت عباد الشمس، زيت جوز الهند، زيت النعناع، فيتامين E',
+        'usage': 'يطبق بلطف على الشفاه. الاستخدام المنتظم يحافظ على نعومة الشفاه.',
+        'benefits': ['مكونات طبيعية', 'صديق للبيئة', 'تأثير منعش', 'حماية طبيعية'],
+        'problems_solved': ['dry_lips', 'natural_care', 'eco_consciousness'],
+        'occasion': ['daily', 'natural_care', 'outdoor'],
+        'finish': 'natural',
+        'isActive': true,
+        'stockStatus': 'in_stock',
+        'rating': 4.3,
+        'reviewsCount': 278
+      },
+
+      // ===== المسكرة =====
+
       {
         'name': "L'Oréal Voluminous Lash Paradise Mascara",
         'arabicName': "مسكرة لوريال فوليومينوس لاش بارادايس",
-        'description': "Mascara gives thick and long lashes with rich coverage in deep black color. Smooth formula allows smooth application without clumping, with dense brush to lift and thicken lashes clearly.",
-        'arabicDescription': "مسكرة تعطي رموش كثيفة وطويلة مع تغطية غنية باللون الأسود العميق. تركيبة ناعمة تسمح بالتطبيق السلس بدون تكتل، مع فرشاة كثيفة لرفع وتكثيف الرموش بشكل واضح.",
+        'description': "Mascara gives thick and long lashes with rich coverage in deep black color. Smooth formula allows smooth application without clumping.",
+        'arabicDescription': "مسكرة تعطي رموش كثيفة وطويلة مع تغطية غنية باللون الأسود العميق. تركيبة ناعمة تسمح بالتطبيق السلس بدون تكتل.",
         'category': 'mascara',
         'brand': "L'Oréal",
         'price': 80.0,
-        'images': [
-          'https://images.unsplash.com/photo-1631214540242-3b0a9e61fa5c?w=400',
-          'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400'
-        ],
+        'images': ['https://images.unsplash.com/photo-1631214540242-3b0a9e61fa5c?w=400'],
         'colors': [
-          {
-            'name': 'Deep Black',
-            'arabicName': 'أسود عميق',
-            'hexCode': '#000000',
-            'isAvailable': true
-          },
-          {
-            'name': 'Brown Black',
-            'arabicName': 'أسود بني',
-            'hexCode': '#2F2F2F',
-            'isAvailable': true
-          }
+          {'name': 'Deep Black', 'arabicName': 'أسود عميق', 'hexCode': '#000000', 'isAvailable': true},
+          {'name': 'Brown Black', 'arabicName': 'أسود بني', 'hexCode': '#2F2F2F', 'isAvailable': true},
         ],
         'skinTypes': ['all'],
-        'suitableFor': {
-          'oily': 85,
-          'dry': 85,
-          'combination': 85,
-          'sensitive': 80,
-          'normal': 90
-        },
+        'suitableFor': {'oily': 85, 'dry': 85, 'combination': 85, 'sensitive': 80, 'normal': 90},
         'features': ['volumizing', 'lengthening', 'no_clumping', 'smooth_application'],
         'ingredients': 'أصباغ مقاومة للماء، شموع طبيعية، بوليمرات مرنة',
         'usage': 'يطبق من جذور الرموش إلى الأطراف بحركة متعرجة. يمكن تطبيق طبقات متعددة.',
         'benefits': ['كثافة واضحة', 'طول طبيعي', 'لون أسود غني', 'ثبات طويل'],
         'problems_solved': ['thin_lashes', 'short_lashes', 'lack_of_definition'],
         'occasion': ['daily', 'professional', 'evening'],
-        'finish': 'matte',
+        'finish': 'volumizing',
         'isActive': true,
         'stockStatus': 'in_stock',
         'rating': 4.4,
         'reviewsCount': 178
       },
 
-      // مسكرة تلسكوبيك
       {
-        'name': "L'Oréal Telescopic Mascara",
-        'arabicName': "مسكرة لوريال تلسكوبيك",
-        'description': "Mascara focuses on clearly lengthening lashes with precise brush that allows covering each lash individually, gives separated and long lashes without clumping.",
-        'arabicDescription': "مسكرة تركز على إطالة الرموش بشكل واضح مع فرشاة دقيقة تسمح بتغطية كل رمش على حدة، تمنح رموشًا منفصلة وطويلة بدون تكتل.",
+        'name': "Maybelline Lash Sensational Mascara",
+        'arabicName': "مسكرة مايبلين لاش سنسيشنال",
+        'description': "Curved brush separates and coats every lash for a full fan effect. Buildable formula for customizable intensity.",
+        'arabicDescription': "فرشاة منحنية تفصل وتغطي كل رمش للحصول على تأثير مروحة كاملة. تركيبة قابلة للبناء لكثافة قابلة للتخصيص.",
         'category': 'mascara',
-        'brand': "L'Oréal",
-        'price': 75.0,
-        'images': [
-          'https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=400',
-          'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400'
-        ],
+        'brand': 'Maybelline',
+        'price': 55.0,
+        'images': ['https://images.unsplash.com/photo-1631214540242-3b0a9e61fa5c?w=400'],
         'colors': [
-          {
-            'name': 'Jet Black',
-            'arabicName': 'أسود فاحم',
-            'hexCode': '#000000',
-            'isAvailable': true
-          },
-          {
-            'name': 'Dark Brown',
-            'arabicName': 'بني غامق',
-            'hexCode': '#654321',
-            'isAvailable': true
-          }
+          {'name': 'Very Black', 'arabicName': 'أسود جداً', 'hexCode': '#000000', 'isAvailable': true},
+          {'name': 'Blackest Black', 'arabicName': 'أسود فاحم', 'hexCode': '#000000', 'isAvailable': true},
         ],
         'skinTypes': ['all'],
-        'suitableFor': {
-          'oily': 90,
-          'dry': 80,
-          'combination': 85,
-          'sensitive': 85,
-          'normal': 95
-        },
-        'features': ['lengthening', 'separating', 'precise_application', 'natural_look'],
-        'ingredients': 'أصباغ طبيعية، شموع مرنة، مكونات مطولة للرموش',
-        'usage': 'يطبق بحركة مستقيمة من الجذور للأطراف. الفرشاة الدقيقة تصل لكل رمش.',
-        'benefits': ['إطالة واضحة', 'رموش منفصلة', 'مظهر طبيعي', 'دقة في التطبيق'],
-        'problems_solved': ['short_lashes', 'clumping', 'uneven_application'],
+        'suitableFor': {'oily': 88, 'dry': 82, 'combination': 85, 'sensitive': 78, 'normal': 88},
+        'features': ['curved_brush', 'separating', 'buildable', 'fan_effect'],
+        'ingredients': 'شموع مرنة، أصباغ كثيفة، بوليمرات فصل',
+        'usage': 'ابدئي من الجذور واستخدمي الفرشاة المنحنية للرفع والفصل. اتركي كل طبقة تجف قبل تطبيق التالية.',
+        'benefits': ['فصل مثالي', 'تأثير مروحة', 'كثافة قابلة للتحكم', 'سعر ممتاز'],
+        'problems_solved': ['clumping', 'uneven_lashes', 'lack_of_separation'],
         'occasion': ['daily', 'professional', 'natural_look'],
-        'finish': 'natural',
+        'finish': 'separated',
         'isActive': true,
         'stockStatus': 'in_stock',
-        'rating': 4.1,
-        'reviewsCount': 142
+        'rating': 4.2,
+        'reviewsCount': 234
       },
 
-      // مسكرة كاربون بلاك
       {
-        'name': "L'Oréal Voluminous Carbon Black Mascara",
-        'arabicName': "مسكرة لوريال فوليومينوس كاربون بلاك",
-        'description': "Ultra-black mascara with dense formula that greatly increases lash volume, gives dramatic look with excellent coverage.",
-        'arabicDescription': "مسكرة فائقة السواد مع تركيبة كثيفة تزيد من حجم الرموش بشكل كبير، تعطي مظهر درامي مع تغطية ممتازة.",
+        'name': "Too Faced Better Than Sex Mascara",
+        'arabicName': "مسكرة تو فيسد بيتر ذان سكس",
+        'description': "Dramatic volumizing mascara with hourglass-shaped brush for explosive lash volume and sexy curves.",
+        'arabicDescription': "مسكرة تكثيف درامية بفرشاة على شكل ساعة رملية للحصول على حجم رموش متفجر ومنحنيات جذابة.",
         'category': 'mascara',
-        'brand': "L'Oréal",
-        'price': 85.0,
-        'images': [
-          'https://images.unsplash.com/photo-1631214540242-3b0a9e61fa5c?w=400',
-          'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400'
-        ],
+        'brand': 'Too Faced',
+        'price': 140.0,
+        'images': ['https://images.unsplash.com/photo-1631214540242-3b0a9e61fa5c?w=400'],
         'colors': [
-          {
-            'name': 'Carbon Black',
-            'arabicName': 'أسود كربوني',
-            'hexCode': '#000000',
-            'isAvailable': true
-          }
+          {'name': 'Black', 'arabicName': 'أسود', 'hexCode': '#000000', 'isAvailable': true},
         ],
         'skinTypes': ['all'],
-        'suitableFor': {
-          'oily': 85,
-          'dry': 75,
-          'combination': 80,
-          'sensitive': 75,
-          'normal': 85
-        },
-        'features': ['ultra_black', 'dramatic_volume', 'dense_formula', 'evening_wear'],
-        'ingredients': 'أصباغ كربونية فائقة، شموع مكثفة، بوليمرات حجم',
-        'usage': 'يطبق بطبقات متعددة للحصول على الحجم المطلوب. مثالية للسهرات.',
-        'benefits': ['حجم درامي', 'أسود فائق', 'تأثير مذهل', 'مثالية للمناسبات'],
-        'problems_solved': ['thin_lashes', 'lack_of_drama', 'special_occasions'],
+        'suitableFor': {'oily': 82, 'dry': 80, 'combination': 83, 'sensitive': 75, 'normal': 85},
+        'features': ['dramatic_volume', 'hourglass_brush', 'premium_formula', 'curve_enhancing'],
+        'ingredients': 'بوليمرات حجم متقدمة، شموع عالية الجودة، أصباغ مكثفة',
+        'usage': 'استخدمي الفرشاة بحركة متعرجة من الجذور إلى الأطراف. كرري للحصول على مزيد من الدراما.',
+        'benefits': ['حجم درامي', 'منحنيات جميلة', 'جودة عالية', 'مثالي للمناسبات'],
+        'problems_solved': ['flat_lashes', 'lack_of_drama', 'special_occasions'],
         'occasion': ['evening', 'special_events', 'dramatic_look'],
         'finish': 'dramatic',
         'isActive': true,
         'stockStatus': 'in_stock',
         'rating': 4.6,
-        'reviewsCount': 95
+        'reviewsCount': 189
+      },
+
+      {
+        'name': "CoverGirl LashBlast Volume Mascara",
+        'arabicName': "مسكرة كافر جيرل لاش بلاست فوليوم",
+        'description': "Big brush mascara for maximum volume impact. Patented volume maximizing formula for full, thick lashes.",
+        'arabicDescription': "مسكرة بفرشاة كبيرة لأقصى تأثير حجم. تركيبة حاصلة على براءة اختراع لتكبير الحجم للحصول على رموش كاملة وكثيفة.",
+        'category': 'mascara',
+        'brand': 'CoverGirl',
+        'price': 45.0,
+        'images': ['https://images.unsplash.com/photo-1631214540242-3b0a9e61fa5c?w=400'],
+        'colors': [
+          {'name': 'Very Black', 'arabicName': 'أسود جداً', 'hexCode': '#000000', 'isAvailable': true},
+          {'name': 'Black Brown', 'arabicName': 'بني أسود', 'hexCode': '#2F2F2F', 'isAvailable': true},
+        ],
+        'skinTypes': ['all'],
+        'suitableFor': {'oily': 85, 'dry': 83, 'combination': 84, 'sensitive': 80, 'normal': 87},
+        'features': ['big_brush', 'maximum_volume', 'patented_formula', 'affordable'],
+        'ingredients': 'تركيبة LashBlast، شموع حجم، أصباغ مقاومة',
+        'usage': 'استخدمي الفرشاة الكبيرة بحركات قصيرة للحصول على أقصى حجم. ابني الطبقات حسب الرغبة.',
+        'benefits': ['حجم أقصى', 'سعر منافس', 'سهولة التطبيق', 'متوفر بسهولة'],
+        'problems_solved': ['thin_lashes', 'budget_friendly', 'quick_application'],
+        'occasion': ['daily', 'budget_conscious', 'quick_routine'],
+        'finish': 'voluminous',
+        'isActive': true,
+        'stockStatus': 'in_stock',
+        'rating': 4.0,
+        'reviewsCount': 156
+      },
+
+      // ===== منتجات إضافية لتنوع أكبر =====
+
+      {
+        'name': "NARS Velvet Matte Lip Pencil",
+        'arabicName': "قلم شفاه نارس فيلفت مات",
+        'description': "Matte lip pencil with velvety texture. Precision application with long-lasting matte finish.",
+        'arabicDescription': "قلم شفاه مطفي بملمس مخملي. تطبيق دقيق مع لمسة نهائية مطفية طويلة الأمد.",
+        'category': 'lipstick',
+        'brand': 'NARS',
+        'price': 150.0,
+        'images': ['https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=400'],
+        'colors': [
+          {'name': 'Dragon Girl', 'arabicName': 'دراغون جيرل', 'hexCode': '#DC143C', 'isAvailable': true},
+          {'name': 'Dolce Vita', 'arabicName': 'دولتشي فيتا', 'hexCode': '#CD5C5C', 'isAvailable': true},
+        ],
+        'skinTypes': ['all'],
+        'suitableFor': {'oily': 90, 'dry': 78, 'combination': 85, 'sensitive': 82, 'normal': 88},
+        'features': ['precision_application', 'velvet_texture', 'long_lasting', 'matte_finish'],
+        'ingredients': 'شموع ناعمة، أصباغ عالية الجودة، مساحيق مخملية',
+        'usage': 'يطبق مباشرة على الشفاه أو يُستخدم لتحديد الشفاه قبل تطبيق أحمر الشفاه.',
+        'benefits': ['دقة في التطبيق', 'ملمس مخملي', 'ألوان غنية', 'جودة عالية'],
+        'problems_solved': ['precision_need', 'professional_application'],
+        'occasion': ['professional', 'evening', 'precise_application'],
+        'finish': 'matte',
+        'isActive': true,
+        'stockStatus': 'in_stock',
+        'rating': 4.5,
+        'reviewsCount': 98
+      },
+
+      {
+        'name': "Urban Decay All Nighter Setting Spray",
+        'arabicName': "سبراي مثبت المكياج أوربان ديكاي",
+        'description': "Makeup setting spray that keeps your look fresh for up to 16 hours. Temperature control technology prevents melting and fading.",
+        'arabicDescription': "رذاذ مثبت المكياج الذي يحافظ على إطلالتك منتعشة لمدة تصل إلى 16 ساعة. تقنية التحكم في درجة الحرارة تمنع الذوبان والبهتان.",
+        'category': 'makeup_setting',
+        'brand': 'Urban Decay',
+        'price': 180.0,
+        'images': ['https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400'],
+        'colors': [
+          {'name': 'Clear', 'arabicName': 'شفاف', 'hexCode': '#FFFFFF', 'isAvailable': true},
+        ],
+        'skinTypes': ['all'],
+        'suitableFor': {'oily': 95, 'dry': 85, 'combination': 92, 'sensitive': 80, 'normal': 90},
+        'features': ['16_hour_wear', 'temperature_control', 'makeup_setting', 'melt_proof'],
+        'ingredients': 'تقنية Temperature Control، مثبتات طويلة الأمد، مرطبات',
+        'usage': 'يُرش على الوجه بعد تطبيق المكياج من مسافة مناسبة. يُترك ليجف طبيعياً.',
+        'benefits': ['ثبات 16 ساعة', 'مقاوم للحرارة', 'يثبت المكياج', 'مناسب لجميع أنواع البشرة'],
+        'problems_solved': ['makeup_fading', 'melting', 'long_wear_need'],
+        'occasion': ['daily', 'special_events', 'hot_weather', 'long_days'],
+        'finish': 'setting',
+        'isActive': true,
+        'stockStatus': 'in_stock',
+        'rating': 4.6,
+        'reviewsCount': 567
       }
     ];
   }
 }
-
-
-

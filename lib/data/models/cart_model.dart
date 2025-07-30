@@ -23,15 +23,58 @@ class CartItem {
   });
 
   factory CartItem.fromJson(Map<String, dynamic> json) {
+    // Helper function to extract user ID
+    String extractUserId(dynamic userField) {
+      if (userField is String) {
+        return userField;
+      } else if (userField is Map<String, dynamic>) {
+        return userField['objectId'] ?? '';
+      }
+      return '';
+    }
+
+    // Helper function to extract product ID
+    String extractProductId(dynamic productField) {
+      if (productField is String) {
+        return productField;
+      } else if (productField is Map<String, dynamic>) {
+        return productField['objectId'] ?? '';
+      }
+      return '';
+    }
+
+    // Helper function to extract product object
+    Product? extractProduct(dynamic productField) {
+      if (productField is Map<String, dynamic> && productField.containsKey('objectId')) {
+        try {
+          return Product.fromJson(productField);
+        } catch (e) {
+          print('❌ Error parsing product: $e');
+          return null;
+        }
+      }
+      return null;
+    }
+
+    // Helper function to parse date
+    DateTime parseDate(dynamic dateField) {
+      if (dateField is String) {
+        return DateTime.tryParse(dateField) ?? DateTime.now();
+      } else if (dateField is Map<String, dynamic> && dateField['iso'] != null) {
+        return DateTime.tryParse(dateField['iso']) ?? DateTime.now();
+      }
+      return DateTime.now();
+    }
+
     return CartItem(
       objectId: json['objectId'] ?? '',
-      userId: json['user']?['objectId'] ?? '',
-      productId: json['product']?['objectId'] ?? '',
-      product: json['product'] != null ? Product.fromJson(json['product']) : null,
+      userId: extractUserId(json['user']),
+      productId: extractProductId(json['product']),
+      product: extractProduct(json['product']),
       quantity: json['quantity'] ?? 1,
       selectedColor: json['selectedColor'] ?? '',
       addedFrom: json['addedFrom'] ?? 'browse',
-      addedAt: DateTime.tryParse(json['addedAt'] ?? '') ?? DateTime.now(),
+      addedAt: parseDate(json['addedAt']),
     );
   }
 

@@ -1,4 +1,4 @@
-// lib/presentation/widgets/product_card.dart - إصلاح مشكلة الخطوط الصفراء
+// lib/presentation/widgets/product_card.dart - مُصلح
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:provider/provider.dart';
@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../data/models/product_model.dart';
 import '../../logic/providers/cart_provider.dart';
+import '../../logic/providers/uth_provider.dart';
 
 class ProductCard extends StatelessWidget {
   final Product product;
@@ -38,24 +39,24 @@ class ProductCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Product Image - إصلاح الارتفاع
+            // Product Image
             _buildProductImage(context),
 
-            // Product Info - إصلاح التخطيط
+            // Product Info
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(8), // تقليل padding
+                padding: const EdgeInsets.all(8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min, // إضافة هذا
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Brand - إصلاح النص
+                    // Brand
                     Text(
                       product.brand,
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         color: AppColors.primary,
                         fontWeight: FontWeight.w600,
-                        fontSize: 10, // تقليل الحجم
+                        fontSize: 10,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -63,15 +64,15 @@ class ProductCard extends StatelessWidget {
 
                     const SizedBox(height: 2),
 
-                    // Product Name - إصلاح النص الطويل
+                    // Product Name
                     Flexible(
                       child: Text(
                         product.arabicName,
                         style: Theme.of(context).textTheme.titleSmall?.copyWith(
                           color: AppColors.onSurface,
                           fontWeight: FontWeight.w600,
-                          fontSize: 12, // تقليل الحجم
-                          height: 1.2, // تقليل ارتفاع السطر
+                          fontSize: 12,
+                          height: 1.2,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -80,7 +81,7 @@ class ProductCard extends StatelessWidget {
 
                     const SizedBox(height: 4),
 
-                    // Rating and Reviews - إصلاح التخطيط
+                    // Rating and Reviews
                     if (product.rating > 0)
                       Row(
                         children: [
@@ -106,7 +107,7 @@ class ProductCard extends StatelessWidget {
 
                     const Spacer(),
 
-                    // Price and Colors - إصلاح التخطيط
+                    // Price and Colors
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -147,7 +148,7 @@ class ProductCard extends StatelessWidget {
 
   Widget _buildProductImage(BuildContext context) {
     return Container(
-      height: 100, // تحديد ارتفاع ثابت
+      height: 100,
       width: double.infinity,
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
@@ -257,11 +258,11 @@ class ProductCard extends StatelessWidget {
   }
 
   Widget _buildAddToCartButton(BuildContext context) {
-    return Consumer<CartProvider>(
-      builder: (context, cartProvider, child) {
+    return Consumer2<CartProvider, AuthProvider>(
+      builder: (context, cartProvider, authProvider, child) {
         return SizedBox(
           width: double.infinity,
-          height: 28, // تقليل الارتفاع
+          height: 28,
           child: ElevatedButton(
             onPressed: product.isOutOfStock ? null : () => _addToCart(context),
             style: ElevatedButton.styleFrom(
@@ -286,6 +287,14 @@ class ProductCard extends StatelessWidget {
   }
 
   void _addToCart(BuildContext context) {
+    final authProvider = context.read<AuthProvider>();
+
+    // Check if user is authenticated
+    if (!authProvider.isAuthenticated) {
+      _showLoginRequiredDialog(context);
+      return;
+    }
+
     if (product.colors.isEmpty) {
       // Add directly if no color options
       _performAddToCart(context, '');
@@ -293,6 +302,33 @@ class ProductCard extends StatelessWidget {
       // Show color selection
       _showColorSelection(context);
     }
+  }
+
+  void _showLoginRequiredDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('تسجيل الدخول مطلوب'),
+        content: const Text('لإضافة المنتجات للسلة، يجب تسجيل الدخول أولاً'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('إلغاء'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              // Navigate to profile/login screen
+              Navigator.of(context).pushNamed('/login'); // تأكد من إضافة route
+            },
+            child: Text(
+              'تسجيل الدخول',
+              style: TextStyle(color: AppColors.primary),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showColorSelection(BuildContext context) {
@@ -369,18 +405,16 @@ class ProductCard extends StatelessWidget {
 
   void _performAddToCart(BuildContext context, String selectedColor) async {
     final cartProvider = context.read<CartProvider>();
-
-    // TODO: Get actual user ID from authentication
-    const userId = 'temp_user_id';
+    final authProvider = context.read<AuthProvider>();
 
     final success = await cartProvider.addToCart(
-      userId,
+      authProvider.userId, // استخدام معرف المستخدم الحقيقي
       product,
       selectedColor,
       addedFrom: 'browse',
     );
 
-    if (success) {
+    if (success && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('تم إضافة ${product.arabicName} للسلة'),
@@ -389,12 +423,13 @@ class ProductCard extends StatelessWidget {
             label: 'عرض السلة',
             textColor: Colors.white,
             onPressed: () {
-              // Navigate to cart
+              // Navigate to cart tab
+              DefaultTabController.of(context)?.animateTo(1);
             },
           ),
         ),
       );
-    } else {
+    } else if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(cartProvider.error ?? 'فشل في إضافة المنتج'),
