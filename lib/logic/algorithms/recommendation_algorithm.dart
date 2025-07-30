@@ -55,6 +55,73 @@ class RecommendationAlgorithm {
       AppConstants.sensitiveSkin: 75,
       AppConstants.normalSkin: 85,
     },
+    "L'Oréal True Match Foundation": {
+      AppConstants.oilySkin: 75,
+      AppConstants.drySkin: 90,
+      AppConstants.combinationSkin: 95,
+      AppConstants.sensitiveSkin: 85,
+      AppConstants.normalSkin: 92,
+    },
+    "Maybelline Fit Me Matte Foundation": {
+      AppConstants.oilySkin: 95,
+      AppConstants.drySkin: 65,
+      AppConstants.combinationSkin: 90,
+      AppConstants.sensitiveSkin: 75,
+      AppConstants.normalSkin: 80,
+    },
+    "MAC Studio Fix Fluid Foundation": {
+      AppConstants.oilySkin: 92,
+      AppConstants.drySkin: 70,
+      AppConstants.combinationSkin: 88,
+      AppConstants.sensitiveSkin: 80,
+      AppConstants.normalSkin: 85,
+    },
+
+    // === منتجات أحمر الخدود الجديدة ===
+    "NARS Orgasm Blush": {
+      AppConstants.oilySkin: 88,
+      AppConstants.drySkin: 92,
+      AppConstants.combinationSkin: 90,
+      AppConstants.sensitiveSkin: 85,
+      AppConstants.normalSkin: 95,
+    },
+    "Milani Baked Blush Luminoso": {
+      AppConstants.oilySkin: 80,
+      AppConstants.drySkin: 90,
+      AppConstants.combinationSkin: 85,
+      AppConstants.sensitiveSkin: 88,
+      AppConstants.normalSkin: 92,
+    },
+    "Tarte Amazonian Clay Blush": {
+      AppConstants.oilySkin: 95,
+      AppConstants.drySkin: 80,
+      AppConstants.combinationSkin: 92,
+      AppConstants.sensitiveSkin: 85,
+      AppConstants.normalSkin: 88,
+    },
+
+    // === منتجات البرونزر الجديدة ===
+    "Benefit Hoola Matte Bronzer": {
+      AppConstants.oilySkin: 90,
+      AppConstants.drySkin: 85,
+      AppConstants.combinationSkin: 88,
+      AppConstants.sensitiveSkin: 82,
+      AppConstants.normalSkin: 92,
+    },
+    "Physicians Formula Butter Bronzer": {
+      AppConstants.oilySkin: 75,
+      AppConstants.drySkin: 95,
+      AppConstants.combinationSkin: 82,
+      AppConstants.sensitiveSkin: 90,
+      AppConstants.normalSkin: 88,
+    },
+    "Too Faced Chocolate Soleil Bronzer": {
+      AppConstants.oilySkin: 88,
+      AppConstants.drySkin: 80,
+      AppConstants.combinationSkin: 85,
+      AppConstants.sensitiveSkin: 78,
+      AppConstants.normalSkin: 90,
+    },
   };
 
   // حساب توصيات المنتجات
@@ -227,6 +294,75 @@ class RecommendationAlgorithm {
           return 25.0;
         }
         break;
+      case 'daily_foundation':
+        if (product.categoryName.contains('أساس') &&
+            (product.finish == AppConstants.naturalFinish ||
+                product.name.contains('True Match'))) {
+          return 25.0;
+        }
+        break;
+      case 'matte_foundation':
+        if (product.categoryName.contains('أساس') &&
+            (product.finish == AppConstants.matteFinish ||
+                product.name.contains('Matte') ||
+                product.name.contains('Studio Fix'))) {
+          return 25.0;
+        }
+        break;
+      case 'full_coverage_foundation':
+        if (product.categoryName.contains('أساس') &&
+            (product.features.contains('full_coverage') ||
+                product.name.contains('Studio Fix'))) {
+          return 25.0;
+        }
+        break;
+
+    // === إضافة دعم لأحمر الخدود ===
+      case 'natural_blush':
+        if (product.categoryName.contains('خدود') &&
+            (product.finish.contains('natural') ||
+                product.name.contains('Orgasm'))) {
+          return 25.0;
+        }
+        break;
+      case 'glowing_blush':
+        if (product.categoryName.contains('خدود') &&
+            (product.finish.contains('glow') ||
+                product.name.contains('Luminoso') ||
+                product.features.contains('luminous'))) {
+          return 25.0;
+        }
+        break;
+      case 'long_lasting_blush':
+        if (product.categoryName.contains('خدود') &&
+            (product.features.contains('12_hour_wear') ||
+                product.name.contains('Clay'))) {
+          return 25.0;
+        }
+        break;
+
+    // === إضافة دعم للبرونزر ===
+      case 'contouring_bronzer':
+        if (product.categoryName.contains('برونزر') &&
+            (product.features.contains('contouring') ||
+                product.name.contains('Hoola'))) {
+          return 25.0;
+        }
+        break;
+      case 'hydrating_bronzer':
+        if (product.categoryName.contains('برونزر') &&
+            (product.features.contains('hydrating') ||
+                product.name.contains('Butter'))) {
+          return 25.0;
+        }
+        break;
+      case 'natural_bronzer':
+        if (product.categoryName.contains('برونزر') &&
+            (product.finish == AppConstants.naturalFinish ||
+                product.name.contains('Chocolate'))) {
+          return 25.0;
+        }
+        break;
     }
     return 0.0;
   }
@@ -249,6 +385,33 @@ class RecommendationAlgorithm {
       case 'glossy':
         if (product.finish == AppConstants.glossyFinish ||
             product.name.contains('Shine')) {
+          return 20.0;
+        }
+        break;
+      case 'matte_coverage':
+        if (product.finish == AppConstants.matteFinish ||
+            product.features.contains('oil_control') ||
+            product.name.contains('Matte')) {
+          return 20.0;
+        }
+        break;
+      case 'natural_coverage':
+        if (product.finish == AppConstants.naturalFinish ||
+            product.features.contains('buildable_coverage') ||
+            product.name.contains('True Match')) {
+          return 20.0;
+        }
+        break;
+      case 'full_coverage':
+        if (product.features.contains('full_coverage') ||
+            product.name.contains('Studio Fix')) {
+          return 20.0;
+        }
+        break;
+      case 'glowing_finish':
+        if (product.finish.contains('glow') ||
+            product.features.contains('luminous') ||
+            product.name.contains('Luminoso')) {
           return 20.0;
         }
         break;
@@ -275,6 +438,34 @@ class RecommendationAlgorithm {
       case 'daily':
         if (product.occasion.contains('daily') ||
             product.name.contains('Paradise')) {
+          return 15.0;
+        }
+        break;
+      case 'photography':
+        if (product.occasion.contains('photography') ||
+            product.features.contains('photo_ready') ||
+            product.name.contains('Studio Fix')) {
+          return 15.0;
+        }
+        break;
+      case 'contouring':
+        if (product.features.contains('contouring') ||
+            product.name.contains('Hoola') ||
+            product.categoryName.contains('برونزر')) {
+          return 15.0;
+        }
+        break;
+      case 'natural_enhancement':
+        if (product.finish.contains('natural') ||
+            product.name.contains('True Match') ||
+            product.name.contains('Orgasm')) {
+          return 15.0;
+        }
+        break;
+      case 'summer_makeup':
+        if (product.features.contains('tropical') ||
+            product.name.contains('Butter') ||
+            product.name.contains('Luminoso')) {
           return 15.0;
         }
         break;

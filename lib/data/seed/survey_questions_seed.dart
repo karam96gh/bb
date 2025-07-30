@@ -460,6 +460,25 @@ class SurveyQuestionsSeedData {
             'arabicText': 'مسكرة دراماتيكية',
             'weights': {'product_type': 'dramatic_mascara', 'effect': 'dramatic'}
           },
+
+          {
+            'key': 'ز',
+            'text': 'Foundation for daily coverage',
+            'arabicText': 'كريم أساس للتغطية اليومية',
+            'weights': {'product_type': 'daily_foundation', 'coverage': 'natural'}
+          },
+          {
+            'key': 'ح',
+            'text': 'Matte foundation for oily skin',
+            'arabicText': 'كريم أساس مطفي للبشرة الدهنية',
+            'weights': {'product_type': 'matte_foundation', 'skin_concern': 'oily'}
+          },
+          {
+            'key': 'ط',
+            'text': 'Blush for natural glow',
+            'arabicText': 'أحمر خدود للإشراقة الطبيعية',
+            'weights': {'product_type': 'natural_blush', 'effect': 'glow'}
+          },
           {
             'key': 'هـ',
             'text': 'Therapeutic lip balm',
@@ -471,7 +490,13 @@ class SurveyQuestionsSeedData {
             'text': 'Complete set',
             'arabicText': 'مجموعة متكاملة',
             'weights': {'product_type': 'all_products', 'variety': 'complete'}
-          }
+          },
+          {
+            'key': 'ي',
+            'text': 'Bronzer for contouring',
+            'arabicText': 'برونزر للكونتور',
+            'weights': {'product_type': 'contouring_bronzer', 'technique': 'contouring'}
+          },
         ],
         'weights': {'product_preference': 0.9},
         'isActive': true,
