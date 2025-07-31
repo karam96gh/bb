@@ -1,15 +1,13 @@
 // lib/presentation/screens/orders/orders_screen.dart - مُصلح
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../logic/providers/order_provider.dart';
 import '../../../logic/providers/uth_provider.dart';
-import '../../../data/models/order_model.dart';
-import 'order_detail_screen.dart';
 import '../auth/login_screen.dart';
+import 'order_detail_screen.dart';
 
 class OrdersScreen extends StatefulWidget {
   const OrdersScreen({Key? key}) : super(key: key);
@@ -23,17 +21,19 @@ class _OrdersScreenState extends State<OrdersScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadOrders();
+      _loadUserOrders();
     });
   }
 
-  void _loadOrders() {
+  void _loadUserOrders() {
     final authProvider = context.read<AuthProvider>();
     final orderProvider = context.read<OrderProvider>();
 
     if (authProvider.isAuthenticated) {
-      print('📋 Loading orders for user: ${authProvider.userId}');
+      print('📦 Loading orders for user: ${authProvider.userId}');
       orderProvider.loadOrders(authProvider.userId);
+    } else {
+      print('❌ User not authenticated, cannot load orders');
     }
   }
 
@@ -51,9 +51,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
             builder: (context, authProvider, child) {
               if (authProvider.isAuthenticated) {
                 return IconButton(
-                  onPressed: _loadOrders,
+                  onPressed: _refreshOrders,
                   icon: Icon(Icons.refresh),
-                  tooltip: 'تحديث',
+                  tooltip: 'تحديث الطلبات',
                 );
               }
               return const SizedBox.shrink();
@@ -63,7 +63,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
       ),
       body: Consumer2<OrderProvider, AuthProvider>(
         builder: (context, orderProvider, authProvider, child) {
-          // Check if user is authenticated
+          // التحقق من حالة تسجيل الدخول
           if (!authProvider.isAuthenticated) {
             return _buildUnauthenticatedView();
           }
@@ -73,7 +73,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
           }
 
           if (orderProvider.error != null) {
-            return _buildErrorView(orderProvider.error!);
+            return _buildErrorView(orderProvider);
           }
 
           if (!orderProvider.hasOrders) {
@@ -140,40 +140,41 @@ class _OrdersScreenState extends State<OrdersScreen> {
     );
   }
 
-  Widget _buildErrorView(String error) {
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.error_outline,
-            size: 80,
-            color: AppColors.error,
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'حدث خطأ',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+  Widget _buildErrorView(OrderProvider orderProvider) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 64,
               color: AppColors.error,
-              fontWeight: FontWeight.bold,
             ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            error,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: AppColors.onSurfaceVariant,
-              height: 1.5,
+            const SizedBox(height: 16),
+            Text(
+              'خطأ في تحميل الطلبات',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                color: AppColors.error,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 32),
-          ElevatedButton(
-            onPressed: _loadOrders,
-            child: const Text('إعادة المحاولة'),
-          ),
-        ],
+            const SizedBox(height: 8),
+            Text(
+              orderProvider.error ?? 'حدث خطأ غير متوقع',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppColors.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: _refreshOrders,
+              child: const Text('إعادة المحاولة'),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -188,11 +189,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
             Icons.shopping_bag_outlined,
             size: 80,
             color: AppColors.onSurfaceVariant.withOpacity(0.5),
-          )
-              .animate()
-              .scale(
-            duration: const Duration(milliseconds: 600),
-            curve: Curves.elasticOut,
           ),
           const SizedBox(height: 24),
           Text(
@@ -201,10 +197,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
               color: AppColors.onSurface,
               fontWeight: FontWeight.w600,
             ),
-          )
-              .animate(delay: const Duration(milliseconds: 200))
-              .fadeIn()
-              .slideY(begin: 0.3, curve: Curves.easeOut),
+          ),
           const SizedBox(height: 12),
           Text(
             'لم تقومي بأي طلبات بعد\nابدئي التسوق وأضيفي منتجات للسلة',
@@ -213,38 +206,15 @@ class _OrdersScreenState extends State<OrdersScreen> {
               height: 1.5,
             ),
             textAlign: TextAlign.center,
-          )
-              .animate(delay: const Duration(milliseconds: 400))
-              .fadeIn()
-              .slideY(begin: 0.2, curve: Curves.easeOut),
-          const SizedBox(height: 40),
-          SizedBox(
-            width: 200,
-            child: ElevatedButton(
-              onPressed: () {
-                // Navigate to products tab
-                DefaultTabController.of(context)?.animateTo(0);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: const Text(
-                'ابدئي التسوق',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          )
-              .animate(delay: const Duration(milliseconds: 600))
-              .fadeIn()
-              .slideY(begin: 0.3, curve: Curves.easeOut),
+          ),
+          const SizedBox(height: 32),
+          ElevatedButton(
+            onPressed: () {
+              // Navigate to products tab
+              DefaultTabController.of(context)?.animateTo(0);
+            },
+            child: const Text('ابدئي التسوق'),
+          ),
         ],
       ),
     );
@@ -252,9 +222,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
   Widget _buildOrdersList(OrderProvider orderProvider) {
     return RefreshIndicator(
-      onRefresh: () async {
-        _loadOrders();
-      },
+      onRefresh: _refreshOrders,
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: orderProvider.orders.length,
@@ -263,20 +231,13 @@ class _OrdersScreenState extends State<OrdersScreen> {
           return Container(
             margin: const EdgeInsets.only(bottom: 12),
             child: _buildOrderCard(order),
-          )
-              .animate(delay: Duration(milliseconds: 100 + (index * 50)))
-              .slideX(
-            begin: 0.3,
-            duration: const Duration(milliseconds: 400),
-            curve: Curves.easeOut,
-          )
-              .fadeIn();
+          );
         },
       ),
     );
   }
 
-  Widget _buildOrderCard(Order order) {
+  Widget _buildOrderCard(order) {
     return GestureDetector(
       onTap: () => _navigateToOrderDetail(order.objectId),
       child: Container(
@@ -295,7 +256,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Order Header
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -326,20 +286,14 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 ),
               ],
             ),
-
             const SizedBox(height: 8),
-
-            // Order Date
             Text(
               'تاريخ الطلب: ${_formatDate(order.createdAt)}',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: AppColors.onSurfaceVariant,
               ),
             ),
-
             const SizedBox(height: 8),
-
-            // Order Summary
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -358,100 +312,35 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 ),
               ],
             ),
-
-            const SizedBox(height: 12),
-
-            // Order Items Preview
-            if (order.items.isNotEmpty)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'المنتجات:',
-                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: AppColors.onSurfaceVariant,
-                      fontWeight: FontWeight.w600,
+            if (order.fromSurvey) ...[
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.info.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.psychology,
+                      size: 14,
+                      color: AppColors.info,
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  ...order.items.take(2).map((item) => Padding(
-                    padding: const EdgeInsets.only(bottom: 2),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.circle,
-                          size: 4,
-                          color: AppColors.onSurfaceVariant,
-                        ),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            '${item.productName} (${item.quantity})',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppColors.onSurfaceVariant,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )).toList(),
-                  if (order.items.length > 2)
+                    const SizedBox(width: 4),
                     Text(
-                      'و ${order.items.length - 2} منتج آخر...',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.primary,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                ],
-              ),
-
-            const SizedBox(height: 12),
-
-            // Action Row
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                if (order.fromSurvey)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: AppColors.info.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      'من التوصيات',
+                      'من توصيات الاستطلاع',
                       style: TextStyle(
                         color: AppColors.info,
-                        fontSize: 10,
+                        fontSize: 11,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                  )
-                else
-                  const SizedBox.shrink(),
-
-                Row(
-                  children: [
-                    Text(
-                      'عرض التفاصيل',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      size: 12,
-                      color: AppColors.primary,
-                    ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ],
         ),
       ),
@@ -478,6 +367,16 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
+  }
+
+  Future<void> _refreshOrders() async {
+    final authProvider = context.read<AuthProvider>();
+    final orderProvider = context.read<OrderProvider>();
+
+    if (authProvider.isAuthenticated) {
+      print('📦 Refreshing orders for user: ${authProvider.userId}');
+      await orderProvider.refreshOrders(authProvider.userId);
+    }
   }
 
   void _navigateToLogin() {

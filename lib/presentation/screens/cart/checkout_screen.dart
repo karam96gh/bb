@@ -722,12 +722,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   bool _validateShippingForm() {
     return _formKey.currentState?.validate() ?? false;
   }
+// lib/presentation/screens/cart/checkout_screen.dart - إصلاح مُحدد
+// التعديل المطلوب في دالة _placeOrder فقط
 
   void _placeOrder() async {
     final authProvider = context.read<AuthProvider>();
     final orderProvider = context.read<OrderProvider>();
     final cartProvider = context.read<CartProvider>();
 
+    // التحقق من تسجيل الدخول
     if (!authProvider.isAuthenticated) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -738,56 +741,129 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       return;
     }
 
+    // التحقق من صحة النموذج
+    if (!_validateShippingForm()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('الرجاء إكمال جميع البيانات المطلوبة'),
+          backgroundColor: AppColors.warning,
+        ),
+      );
+      return;
+    }
+
+    // التحقق من وجود منتجات في السلة
+    if (widget.cartItems.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('السلة فارغة'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+
+    print('📦 Creating order for user: ${authProvider.userId}');
+    print('📦 Cart items count: ${widget.cartItems.length}');
+    print('📦 User details: ${authProvider.fullName} (${authProvider.email})');
+
     final shippingInfo = {
-      'fullName': _fullNameController.text,
-      'phone': _phoneController.text,
-      'address': _addressController.text,
-      'city': _cityController.text,
-      'postalCode': _postalCodeController.text,
-      'additionalInfo': _additionalInfoController.text,
+      'fullName': _fullNameController.text.trim(),
+      'phone': _phoneController.text.trim(),
+      'address': _addressController.text.trim(),
+      'city': _cityController.text.trim(),
+      'postalCode': _postalCodeController.text.trim(),
+      'additionalInfo': _additionalInfoController.text.trim(),
     };
 
     final contactInfo = {
-      'email': _emailController.text,
-      'alternativePhone': _alternativePhoneController.text,
+      'email': _emailController.text.trim(),
+      'alternativePhone': _alternativePhoneController.text.trim(),
       'preferredContactTime': _preferredContactTime,
       'communicationMethod': _communicationMethod,
     };
 
-    final orderId = await orderProvider.createOrderFromCart(
-      authProvider.userId,
-      shippingInfo,
-      contactInfo,
-      _notesController.text,
-    );
+    // طباعة البيانات للتشخيص
+    print('📦 Shipping info: $shippingInfo');
+    print('📦 Contact info: $contactInfo');
+    print('📦 Customer notes: ${_notesController.text}');
 
-    if (orderId != null && mounted) {
-      // Clear cart
-      await cartProvider.clearCart(authProvider.userId);
-
-      // Navigate to order details
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => OrderDetailScreen(orderId: orderId),
-        ),
+    try {
+      final orderId = await orderProvider.createOrderFromCart(
+        authProvider.userId, // استخدام معرف المستخدم الحقيقي
+        shippingInfo,
+        contactInfo,
+        _notesController.text.trim(),
       );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('تم إرسال طلبك بنجاح!'),
-          backgroundColor: AppColors.success,
-        ),
-      );
-    } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(orderProvider.error ?? 'فشل في إرسال الطلب'),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      if (orderId != null && mounted) {
+        print('✅ Order created successfully with ID: $orderId');
+
+        // مسح السلة بعد نجاح الطلب
+        final cartCleared = await cartProvider.clearCart(authProvider.userId);
+        print(cartCleared ? '✅ Cart cleared successfully' : '⚠️ Failed to clear cart');
+
+        // إعادة تحميل الطلبات
+        await orderProvider.refreshOrders(authProvider.userId);
+
+        // الانتقال لتفاصيل الطلب
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => OrderDetailScreen(orderId: orderId),
+          ),
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.check_circle, color: Colors.white),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text('تم إرسال طلبك بنجاح! رقم الطلب: ${orderProvider.currentOrder?.orderNumber ?? orderId}'),
+                ),
+              ],
+            ),
+            backgroundColor: AppColors.success,
+            duration: const Duration(seconds: 5),
+          ),
+        );
+      } else if (mounted) {
+        print('❌ Failed to create order');
+        final errorMessage = orderProvider.error ?? 'فشل في إرسال الطلب';
+        print('❌ Error: $errorMessage');
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.error, color: Colors.white),
+                const SizedBox(width: 8),
+                Expanded(child: Text(errorMessage)),
+              ],
+            ),
+            backgroundColor: AppColors.error,
+            duration: const Duration(seconds: 5),
+            action: SnackBarAction(
+              label: 'إعادة المحاولة',
+              textColor: Colors.white,
+              onPressed: _placeOrder,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      print('❌ Exception during order creation: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('حدث خطأ غير متوقع: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
     }
   }
-
   String _getCommunicationMethodText(String method) {
     switch (method) {
       case 'phone': return 'مكالمة هاتفية';

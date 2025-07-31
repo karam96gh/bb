@@ -10,6 +10,7 @@ class CartItem {
   final String selectedColor;
   final String addedFrom;
   final DateTime addedAt;
+  final double unitPrice; // إضافة السعر المحفوظ
 
   CartItem({
     required this.objectId,
@@ -20,6 +21,7 @@ class CartItem {
     required this.selectedColor,
     required this.addedFrom,
     required this.addedAt,
+    required this.unitPrice, // مطلوب الآن
   });
 
   factory CartItem.fromJson(Map<String, dynamic> json) {
@@ -43,14 +45,11 @@ class CartItem {
       return '';
     }
 
-    // Helper function to extract product object - مُحسن
+    // Helper function to extract product object
     Product? extractProduct(dynamic productField) {
-      if (productField is Map<String, dynamic>) {
+      if (productField is Map<String, dynamic> && productField.containsKey('objectId')) {
         try {
-          // التأكد من وجود objectId
-          if (productField.containsKey('objectId')) {
-            return Product.fromJson(productField);
-          }
+          return Product.fromJson(productField);
         } catch (e) {
           print('❌ Error parsing product: $e');
           return null;
@@ -69,15 +68,26 @@ class CartItem {
       return DateTime.now();
     }
 
+    // استخراج المنتج أولاً للحصول على السعر
+    final product = extractProduct(json['product']);
+    // الحصول على السعر المحفوظ أو من المنتج
+    double unitPrice = (json['unitPrice'] ?? 0).toDouble();
+
+    // إذا لم يكن السعر محفوظ، استخدم سعر المنتج
+    if (unitPrice == 0 && product != null) {
+      unitPrice = product.price;
+    }
+
     return CartItem(
       objectId: json['objectId'] ?? '',
       userId: extractUserId(json['user']),
       productId: extractProductId(json['product']),
-      product: extractProduct(json['product']),
+      product: product,
       quantity: json['quantity'] ?? 1,
       selectedColor: json['selectedColor'] ?? '',
       addedFrom: json['addedFrom'] ?? 'browse',
       addedAt: parseDate(json['addedAt']),
+      unitPrice: unitPrice, // استخدام السعر المستخرج
     );
   }
 
@@ -88,16 +98,16 @@ class CartItem {
       'quantity': quantity,
       'selectedColor': selectedColor,
       'addedFrom': addedFrom,
+      'unitPrice': unitPrice, // حفظ السعر
       'addedAt': {'__type': 'Date', 'iso': addedAt.toIso8601String()},
     };
   }
 
-  // Helper methods - مُحسن لحل مشكلة السعر صفر
+  // Helper methods - مُصلحة
   double get totalPrice {
-    if (product != null && product!.price > 0) {
-      return product!.price * quantity;
-    }
-    return 0.0;
+    // استخدام السعر المحفوظ أولاً، ثم سعر المنتج
+    final price = unitPrice > 0 ? unitPrice : (product?.price ?? 0);
+    return price * quantity;
   }
 
   String get displayTotalPrice => '${totalPrice.toStringAsFixed(0)} ر.س';
@@ -106,6 +116,7 @@ class CartItem {
     String? objectId,
     int? quantity,
     String? selectedColor,
+    double? unitPrice,
   }) {
     return CartItem(
       objectId: objectId ?? this.objectId,
@@ -116,6 +127,7 @@ class CartItem {
       selectedColor: selectedColor ?? this.selectedColor,
       addedFrom: addedFrom,
       addedAt: addedAt,
+      unitPrice: unitPrice ?? this.unitPrice,
     );
   }
 }

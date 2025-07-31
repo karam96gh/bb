@@ -57,6 +57,13 @@ class AuthProvider extends ChangeNotifier {
     _setLoading(false);
   }
 
+  String get effectiveUserId {
+    if (isAuthenticated && _userId.isNotEmpty) {
+      return _userId;
+    }
+    // إنشاء guest user ID مؤقت
+    return 'guest_${DateTime.now().millisecondsSinceEpoch}';
+  }
   // Sign up new user
   Future<bool> signUp({
     required String fullName,

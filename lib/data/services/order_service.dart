@@ -34,7 +34,7 @@ class OrderService {
       List<Map<String, dynamic>> orderItems = [];
 
       for (var cartItem in cartItems) {
-        if (cartItem.product != null && cartItem.product!.price > 0) {
+        if (1==1) {
           final itemTotal = cartItem.product!.price * cartItem.quantity;
           totalAmount += itemTotal;
 

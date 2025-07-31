@@ -1,5 +1,6 @@
 
 // lib/presentation/screens/products/product_detail_screen.dart
+import 'package:beauty/logic/providers/uth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
@@ -23,15 +24,25 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   int _selectedImageIndex = 0;
   ProductColor? _selectedColor;
   final PageController _imageController = PageController();
-
+  String userId = '';
   @override
   void initState() {
     super.initState();
     if (widget.product.colors.isNotEmpty) {
       _selectedColor = widget.product.colors.first;
     }
+    _loadUserOrders();
   }
+  void _loadUserOrders() {
+    final authProvider = context.read<AuthProvider>();
 
+    if (authProvider.isAuthenticated) {
+      print('📦 Loading orders for user: ${authProvider.userId}');
+      userId=authProvider.userId;
+    } else {
+      print('❌ User not authenticated, cannot load orders');
+    }
+  }
   @override
   void dispose() {
     _imageController.dispose();
@@ -572,7 +583,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     }
 
     // TODO: Get actual user ID from authentication
-    const userId = 'temp_user_id';
+
 
     final success = await cartProvider.addToCart(
       userId,

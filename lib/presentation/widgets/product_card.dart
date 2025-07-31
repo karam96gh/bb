@@ -407,8 +407,17 @@ class ProductCard extends StatelessWidget {
     final cartProvider = context.read<CartProvider>();
     final authProvider = context.read<AuthProvider>();
 
+    // التحقق من تسجيل الدخول
+    if (!authProvider.isAuthenticated || authProvider.userId.isEmpty) {
+      print('❌ User not authenticated - userId: ${authProvider.userId}');
+      _showLoginRequiredDialog(context);
+      return;
+    }
+
+    print('🛒 Adding product for user: ${authProvider.userId}');
+
     final success = await cartProvider.addToCart(
-      authProvider.userId, // استخدام معرف المستخدم الحقيقي
+      authProvider.userId, // استخدام المعرف الحقيقي
       product,
       selectedColor,
       addedFrom: 'browse',

@@ -42,12 +42,19 @@ class _BottomNavigationState extends State<BottomNavigation> {
     final productProvider = context.read<ProductProvider>();
     final cartProvider = context.read<CartProvider>();
 
+    print('🔍 Initializing providers...');
+    print('🔍 Auth status: ${authProvider.isAuthenticated}');
+    print('🔍 User ID: ${authProvider.userId}');
+
     // Initialize products
     productProvider.initialize();
 
-    // Load cart if user is authenticated
-    if (authProvider.isAuthenticated) {
+    // Load cart only if user is properly authenticated
+    if (authProvider.isAuthenticated && authProvider.userId.isNotEmpty) {
+      print('✅ Loading cart for user: ${authProvider.userId}');
       cartProvider.loadCart(authProvider.userId);
+    } else {
+      print('⚠️ User not authenticated, skipping cart load');
     }
   }
 

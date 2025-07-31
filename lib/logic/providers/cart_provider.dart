@@ -32,7 +32,7 @@ class CartProvider extends ChangeNotifier {
   // Load user's cart - مُحسن
   Future<void> loadCart(String userId) async {
     if (userId.isEmpty) {
-      print('⚠️ Cannot load cart: userId is empty');
+      print('❌ Empty user ID provided to loadCart');
       return;
     }
 
@@ -40,18 +40,13 @@ class CartProvider extends ChangeNotifier {
     _error = null;
 
     try {
-      print('🛒 Loading cart for user: $userId');
-
-      // تنظيف السلة من العناصر التالفة أولاً
-      await CartService.cleanupCart(userId);
-
+      print('🛒 CartProvider: Loading cart for user $userId');
       _cartItems = await CartService.getUserCart(userId);
       _calculateSummary();
-
-      print('✅ Cart loaded: ${_cartItems.length} items, Total: ${_totalAmount} ر.س');
+      print('✅ CartProvider: Cart loaded successfully with ${_cartItems.length} items');
     } catch (e) {
       _error = 'خطأ في تحميل السلة: $e';
-      print('❌ Error loading cart: $e');
+      print('❌ CartProvider: Error loading cart: $e');
     }
 
     _setLoading(false);
@@ -65,20 +60,23 @@ class CartProvider extends ChangeNotifier {
         int quantity = 1,
         String addedFrom = 'browse',
       }) async {
+
     if (userId.isEmpty) {
       _error = 'يجب تسجيل الدخول أولاً';
-      _safeNotifyListeners();
-      return false;
-    }
-
-    if (product.price <= 0) {
-      _error = 'سعر المنتج غير صحيح';
-      _safeNotifyListeners();
+      notifyListeners();
       return false;
     }
 
     try {
-      print('🛒 Adding to cart: ${product.arabicName} - ${product.price} ر.س');
+      print('🛒 CartProvider: Adding ${product.arabicName} to cart');
+      print('🛒 Product price: ${product.price}');
+
+      // التحقق من صحة سعر المنتج
+      if (product.price <= 0) {
+        _error = 'سعر المنتج غير صالح';
+        notifyListeners();
+        return false;
+      }
 
       final cartItem = CartItem(
         objectId: '',
@@ -89,22 +87,24 @@ class CartProvider extends ChangeNotifier {
         selectedColor: selectedColor,
         addedFrom: addedFrom,
         addedAt: DateTime.now(),
+        unitPrice: product.price, // إضافة السعر من المنتج
       );
 
       final result = await CartService.addToCart(cartItem);
       if (result != null) {
-        await loadCart(userId); // Refresh cart
-        print('✅ Product added to cart successfully');
+        // إعادة تحميل السلة للحصول على البيانات المحدثة
+        await loadCart(userId);
+        print('✅ CartProvider: Product added successfully');
         return true;
       } else {
         _error = 'فشل في إضافة المنتج للسلة';
-        _safeNotifyListeners();
+        notifyListeners();
         return false;
       }
     } catch (e) {
       _error = 'خطأ في إضافة المنتج للسلة: $e';
-      print('❌ Error adding to cart: $e');
-      _safeNotifyListeners();
+      print('❌ CartProvider: Error adding to cart: $e');
+      notifyListeners();
       return false;
     }
   }
@@ -112,19 +112,22 @@ class CartProvider extends ChangeNotifier {
   // Update item quantity - مُحسن
   Future<bool> updateQuantity(String userId, String cartItemId, int newQuantity) async {
     try {
-      print('🔄 Updating quantity: $cartItemId -> $newQuantity');
+      print('🛒 CartProvider: Updating quantity for item $cartItemId to $newQuantity');
 
       final success = await CartService.updateCartItemQuantity(cartItemId, newQuantity);
       if (success) {
-        await loadCart(userId); // Refresh cart
-        print('✅ Quantity updated successfully');
+        await loadCart(userId); // إعادة تحميل السلة
+        print('✅ CartProvider: Quantity updated successfully');
         return true;
+      } else {
+        _error = 'فشل في تحديث الكمية';
+        notifyListeners();
+        return false;
       }
-      return false;
     } catch (e) {
       _error = 'خطأ في تحديث الكمية: $e';
-      print('❌ Error updating quantity: $e');
-      _safeNotifyListeners();
+      print('❌ CartProvider: Error updating quantity: $e');
+      notifyListeners();
       return false;
     }
   }
@@ -132,19 +135,22 @@ class CartProvider extends ChangeNotifier {
   // Remove item from cart - مُحسن
   Future<bool> removeFromCart(String userId, String cartItemId) async {
     try {
-      print('🗑️ Removing from cart: $cartItemId');
+      print('🛒 CartProvider: Removing item $cartItemId');
 
       final success = await CartService.removeFromCart(cartItemId);
       if (success) {
-        await loadCart(userId); // Refresh cart
-        print('✅ Item removed successfully');
+        await loadCart(userId); // إعادة تحميل السلة
+        print('✅ CartProvider: Item removed successfully');
         return true;
+      } else {
+        _error = 'فشل في حذف المنتج';
+        notifyListeners();
+        return false;
       }
-      return false;
     } catch (e) {
       _error = 'خطأ في حذف المنتج: $e';
-      print('❌ Error removing from cart: $e');
-      _safeNotifyListeners();
+      print('❌ CartProvider: Error removing from cart: $e');
+      notifyListeners();
       return false;
     }
   }
@@ -152,20 +158,23 @@ class CartProvider extends ChangeNotifier {
   // Clear entire cart - مُحسن
   Future<bool> clearCart(String userId) async {
     try {
-      print('🗑️ Clearing cart for user: $userId');
+      print('🛒 CartProvider: Clearing cart for user $userId');
 
       final success = await CartService.clearCart(userId);
       if (success) {
         _cartItems.clear();
         _calculateSummary();
-        print('✅ Cart cleared successfully');
+        print('✅ CartProvider: Cart cleared successfully');
         return true;
+      } else {
+        _error = 'فشل في إفراغ السلة';
+        notifyListeners();
+        return false;
       }
-      return false;
     } catch (e) {
       _error = 'خطأ في إفراغ السلة: $e';
-      print('❌ Error clearing cart: $e');
-      _safeNotifyListeners();
+      print('❌ CartProvider: Error clearing cart: $e');
+      notifyListeners();
       return false;
     }
   }
@@ -193,47 +202,45 @@ class CartProvider extends ChangeNotifier {
         .fold(0, (sum, item) => sum + item.quantity);
   }
 
-  // Calculate cart summary - مُحسن لحل مشكلة السعر صفر
+  // Calculate cart summary - مُحسن
   void _calculateSummary() {
     _totalAmount = 0.0;
     _totalItems = 0;
     _uniqueItemsCount = _cartItems.length;
 
     for (var item in _cartItems) {
-      if (item.product != null && item.product!.price > 0) {
-        final itemTotal = item.product!.price * item.quantity;
-        _totalAmount += itemTotal;
-        _totalItems += item.quantity;
+      final itemTotal = item.totalPrice;
+      _totalAmount += itemTotal;
+      _totalItems += item.quantity;
 
-        print('📊 Item: ${item.product!.arabicName} - ${item.quantity}x${item.product!.price} = ${itemTotal}');
-      } else {
-        print('⚠️ Invalid cart item found: ${item.objectId}');
-      }
+      // طباعة للتشخيص
+      print('Item: ${item.product?.arabicName} - Unit: ${item.unitPrice} - Qty: ${item.quantity} - Total: $itemTotal');
     }
 
-    print('📊 Cart Summary: ${_totalItems} items, Total: ${_totalAmount} ر.س');
-    _safeNotifyListeners();
+    print('🛒 Cart summary calculated: $_totalItems items, ${_totalAmount.toStringAsFixed(0)} ر.س');
+    notifyListeners();
   }
 
   // Validate cart before checkout
   bool validateCart() {
     if (_cartItems.isEmpty) {
       _error = 'السلة فارغة';
-      _safeNotifyListeners();
+      notifyListeners();
       return false;
     }
 
-    // Check if all products are still in stock and have valid prices
+    // Check if all products are still in stock
     for (var item in _cartItems) {
       if (item.product?.isOutOfStock == true) {
         _error = 'المنتج ${item.product?.arabicName} غير متوفر حالياً';
-        _safeNotifyListeners();
+        notifyListeners();
         return false;
       }
 
-      if (item.product == null || item.product!.price <= 0) {
-        _error = 'يوجد منتج بسعر غير صحيح في السلة';
-        _safeNotifyListeners();
+      // التحقق من صحة السعر
+      if (item.unitPrice <= 0) {
+        _error = 'سعر المنتج ${item.product?.arabicName} غير صالح';
+        notifyListeners();
         return false;
       }
     }
@@ -241,43 +248,20 @@ class CartProvider extends ChangeNotifier {
     return true;
   }
 
-  // Private helper methods - مُحسن لتجنب مشاكل البناء
+  // Private helper methods - مُحسن
   void _setLoading(bool loading) {
     _isLoading = loading;
-    _safeNotifyListeners();
-  }
-
-  void _safeNotifyListeners() {
-    // Use post frame callback to avoid calling notifyListeners during build
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      notifyListeners();
-    });
+    notifyListeners();
   }
 
   void clearError() {
     _error = null;
-    _safeNotifyListeners();
+    notifyListeners();
   }
 
-  // إضافة دالة للتحقق من صحة السلة وإصلاحها
-  Future<void> validateAndFixCart(String userId) async {
-    if (userId.isEmpty) return;
-
-    try {
-      bool needsRefresh = false;
-
-      for (var item in List.from(_cartItems)) {
-        if (item.product == null || item.product!.price <= 0) {
-          await removeFromCart(userId, item.objectId);
-          needsRefresh = true;
-        }
-      }
-
-      if (needsRefresh) {
-        await loadCart(userId);
-      }
-    } catch (e) {
-      print('❌ Error validating cart: $e');
-    }
+  // Force refresh cart - جديد
+  Future<void> refreshCart(String userId) async {
+    print('🛒 CartProvider: Force refreshing cart');
+    await loadCart(userId);
   }
 }

@@ -6,52 +6,63 @@ import 'back4app_service.dart';
 import '../../core/constants/app_constants.dart';
 
 class CartService {
-  // Get user's cart items - مُصلح لحل مشكلة عدم ظهور المنتجات
+  // Get user's cart items - مُحسن
   static Future<List<CartItem>> getUserCart(String userId) async {
     try {
+      print('🛒 Loading cart for user: $userId');
+
+      if (userId.isEmpty || userId == 'temp_user_id') {
+        print('❌ Invalid userId: $userId');
+        return [];
+      }
+
       final query = Back4AppService.buildQuery<ParseObject>(AppConstants.cartTable);
       query.whereEqualTo('user', ParseObject(AppConstants.usersTable)..objectId = userId);
 
-      // تضمين تفاصيل المنتج والفئة بشكل صحيح
-      query.includeObject(['product', 'product.category']);
+      // التأكد من تحميل بيانات المنتج بشكل صحيح
+      query.includeObject(['product']);
+      query.includeObject(['product.category']); // إضافة منفصلة للتأكد
+
       query.orderByDescending('addedAt');
 
       final results = await Back4AppService.queryWithConditions(query);
 
+      print('🛒 Raw results count: ${results.length}');
+
       final cartItems = <CartItem>[];
-
-      for (final result in results) {
+      for (int i = 0; i < results.length; i++) {
+        final result = results[i];
         try {
-          final cartItem = CartItem.fromJson(result.toJson());
+          print('🛒 Processing cart item ${i + 1}:');
+          print('  Raw data keys: ${result.toJson().keys.toList()}');
 
-          // التأكد من وجود المنتج وصحة البيانات
-          if (cartItem.product != null && cartItem.product!.price > 0) {
-            cartItems.add(cartItem);
-          } else {
-            print('⚠️ Cart item has missing or invalid product data: ${cartItem.objectId}');
-            // يمكن حذف العنصر التالف من السلة
-            await removeFromCart(cartItem.objectId);
-          }
+          final cartItem = CartItem.fromJson(result.toJson());
+          cartItems.add(cartItem);
+
+          print('  ✅ Successfully parsed item: ${cartItem.product?.arabicName ?? 'Unknown'}');
         } catch (e) {
-          print('❌ Error parsing cart item: $e');
+          print('❌ Error parsing cart item ${i + 1}: $e');
+          print('Raw data: ${result.toJson()}');
           continue;
         }
       }
 
+      print('✅ Successfully parsed ${cartItems.length} cart items');
       return cartItems;
     } catch (e) {
       print('❌ Error getting user cart: $e');
       return [];
     }
   }
-
   // Add item to cart - مُحسن
   static Future<String?> addToCart(CartItem cartItem) async {
     try {
-      // التحقق من صحة بيانات المنتج قبل الإضافة
-      if (cartItem.product == null || cartItem.product!.price <= 0) {
-        print('❌ Cannot add cart item: Invalid product data');
-        return null;
+      print('🛒 Adding to cart: ${cartItem.product?.arabicName} - Price: ${cartItem.unitPrice}');
+
+      // التحقق من صحة البيانات قبل الإضافة
+      if (cartItem.unitPrice <= 0) {
+        print('❌ Invalid price: ${cartItem.unitPrice}');
+        throw Exception('سعر المنتج غير صالح');
       }
 
       // Check if item already exists
@@ -62,19 +73,24 @@ class CartService {
       );
 
       if (existingItem != null) {
+        print('🛒 Item exists, updating quantity');
         // Update quantity
         final newQuantity = existingItem.quantity + cartItem.quantity;
         final updated = await updateCartItemQuantity(existingItem.objectId, newQuantity);
         return updated ? existingItem.objectId : null;
       } else {
+        print('🛒 Adding new item to cart');
         // Add new item
         final data = cartItem.toJson();
-        final result = await Back4AppService.create(AppConstants.cartTable, data);
 
-        if (result != null) {
-          print('✅ Cart item added successfully: $result');
+        // التأكد من وجود السعر في البيانات
+        if (!data.containsKey('unitPrice') || data['unitPrice'] <= 0) {
+          print('❌ Missing or invalid unitPrice in data');
+          throw Exception('خطأ في حفظ سعر المنتج');
         }
 
+        final result = await Back4AppService.create(AppConstants.cartTable, data);
+        print('✅ Cart item added with ID: $result');
         return result;
       }
     } catch (e) {
@@ -90,12 +106,11 @@ class CartService {
       query.whereEqualTo('user', ParseObject(AppConstants.usersTable)..objectId = userId);
       query.whereEqualTo('product', ParseObject(AppConstants.productsTable)..objectId = productId);
 
-      // تحسين البحث بالألوان
+      // إضافة فلتر اللون فقط إذا كان موجود
       if (color.isNotEmpty) {
         query.whereEqualTo('selectedColor', color);
       }
 
-      // تضمين تفاصيل المنتج
       query.includeObject(['product', 'product.category']);
 
       final results = await Back4AppService.queryWithConditions(query);
@@ -109,63 +124,54 @@ class CartService {
     }
   }
 
-  // Update cart item quantity
+  // Update cart item quantity - مُحسن
   static Future<bool> updateCartItemQuantity(String cartItemId, int quantity) async {
     try {
+      print('🛒 Updating cart item $cartItemId quantity to $quantity');
+
       if (quantity <= 0) {
         return await removeFromCart(cartItemId);
       }
 
-      final updated = await Back4AppService.update(AppConstants.cartTable, cartItemId, {
+      final success = await Back4AppService.update(AppConstants.cartTable, cartItemId, {
         'quantity': quantity,
-        'updatedAt': {'__type': 'Date', 'iso': DateTime.now().toIso8601String()},
       });
 
-      if (updated) {
-        print('✅ Cart item quantity updated: $cartItemId -> $quantity');
-      }
-
-      return updated;
+      print(success ? '✅ Quantity updated' : '❌ Failed to update quantity');
+      return success;
     } catch (e) {
       print('❌ Error updating cart item quantity: $e');
       return false;
     }
   }
 
-  // Remove item from cart
+  // Remove item from cart - مُحسن
   static Future<bool> removeFromCart(String cartItemId) async {
     try {
-      final result = await Back4AppService.delete(AppConstants.cartTable, cartItemId);
-
-      if (result) {
-        print('✅ Cart item removed: $cartItemId');
-      }
-
-      return result;
+      print('🛒 Removing cart item: $cartItemId');
+      final success = await Back4AppService.delete(AppConstants.cartTable, cartItemId);
+      print(success ? '✅ Item removed' : '❌ Failed to remove item');
+      return success;
     } catch (e) {
       print('❌ Error removing from cart: $e');
       return false;
     }
   }
 
-  // Clear user's cart
+  // Clear user's cart - مُحسن
   static Future<bool> clearCart(String userId) async {
     try {
+      print('🛒 Clearing cart for user: $userId');
       final cartItems = await getUserCart(userId);
 
-      bool allCleared = true;
+      bool allSuccess = true;
       for (var item in cartItems) {
-        final removed = await removeFromCart(item.objectId);
-        if (!removed) {
-          allCleared = false;
-        }
+        final success = await removeFromCart(item.objectId);
+        if (!success) allSuccess = false;
       }
 
-      if (allCleared) {
-        print('✅ Cart cleared for user: $userId');
-      }
-
-      return allCleared;
+      print(allSuccess ? '✅ Cart cleared' : '⚠️ Some items failed to remove');
+      return allSuccess;
     } catch (e) {
       print('❌ Error clearing cart: $e');
       return false;
@@ -181,11 +187,11 @@ class CartService {
       int totalItems = 0;
 
       for (var item in cartItems) {
-        if (item.product != null && item.product!.price > 0) {
-          totalAmount += item.totalPrice;
-          totalItems += item.quantity;
-        }
+        totalAmount += item.totalPrice;
+        totalItems += item.quantity;
       }
+
+      print('🛒 Cart summary: $totalItems items, ${totalAmount.toStringAsFixed(0)} ر.س');
 
       return {
         'totalAmount': totalAmount,
@@ -199,34 +205,6 @@ class CartService {
         'totalItems': 0,
         'itemsCount': 0,
       };
-    }
-  }
-
-  // تنظيف السلة من العناصر التالفة
-  static Future<void> cleanupCart(String userId) async {
-    try {
-      final query = Back4AppService.buildQuery<ParseObject>(AppConstants.cartTable);
-      query.whereEqualTo('user', ParseObject(AppConstants.usersTable)..objectId = userId);
-
-      final results = await Back4AppService.queryWithConditions(query);
-
-      for (final result in results) {
-        try {
-          final cartItem = CartItem.fromJson(result.toJson());
-
-          // حذف العناصر التي لا تحتوي على منتج صحيح
-          if (cartItem.product == null || cartItem.product!.price <= 0) {
-            await removeFromCart(cartItem.objectId);
-            print('🗑️ Removed invalid cart item: ${cartItem.objectId}');
-          }
-        } catch (e) {
-          // حذف العناصر التي لا يمكن تحليلها
-          await Back4AppService.delete(AppConstants.cartTable, result.objectId!);
-          print('🗑️ Removed corrupted cart item: ${result.objectId}');
-        }
-      }
-    } catch (e) {
-      print('❌ Error cleaning up cart: $e');
     }
   }
 }

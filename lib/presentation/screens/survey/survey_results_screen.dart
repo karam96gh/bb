@@ -395,7 +395,7 @@ class _SurveyResultsScreenState extends State<SurveyResultsScreen> {
 
         const SizedBox(height: 16),
 
-        ...recommendationProvider.recommendations.take(3).map((recommendation) {
+        ...recommendationProvider.recommendations.take(5).map((recommendation) {
           return Container(
             margin: const EdgeInsets.only(bottom: 16),
             child: _buildRecommendationCard(context, recommendation),

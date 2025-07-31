@@ -28,12 +28,21 @@ class _CartScreenState extends State<CartScreen> {
     });
   }
 
+
   void _loadUserCart() {
     final authProvider = context.read<AuthProvider>();
     final cartProvider = context.read<CartProvider>();
 
-    if (authProvider.isAuthenticated) {
+    print('🔍 Auth check - isAuthenticated: ${authProvider.isAuthenticated}');
+    print('🔍 Auth check - userId: ${authProvider.userId}');
+    print('🔍 Auth check - email: ${authProvider.email}');
+
+    if (authProvider.isAuthenticated && authProvider.userId.isNotEmpty) {
+      print('✅ Loading cart for authenticated user: ${authProvider.userId}');
       cartProvider.loadCart(authProvider.userId);
+    } else {
+      print('❌ User not authenticated or userId is empty');
+      // يمكن إنشاء guest cart هنا إذا أردت
     }
   }
 
